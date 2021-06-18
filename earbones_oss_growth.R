@@ -20,12 +20,11 @@ library(gridExtra)
 
 #DATA IMPORT ----
 #Import data
-ossification_seq <- read_csv("Data/ear bones ossification events.csv")
+ossification_seq <- read_csv("Data/earbones_ossification_events.csv")
 ossification_seq$state <-  as.character(ossification_seq$state)
 measuraments <- read_csv("Data/measuraments.csv")
 
-mysticeti_growth_curve <- read_csv("Data/mysticeti_growth_curve_data.csv")
-odontoceti_growth_curve <- read_csv("Data/odontoceti_growth_curve_data.csv")
+growth_curve <- read_csv("Data/growth_data.csv")
 
 #Split groups
 ossification_seq_groups <- ossification_seq %>% group_by(group) %>% group_split()
