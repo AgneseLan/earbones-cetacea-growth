@@ -22,51 +22,50 @@ library(gridExtra)
 #Import data
 ossification_seq <- read_csv("Data/earbones_ossification_events.csv")
 ossification_seq$state <-  as.character(ossification_seq$state)
+
 measuraments <- read_csv("Data/measuraments.csv")
 
 growth_curve <- read_csv("Data/growth_data.csv")
 
-#Split groups
-ossification_seq_groups <- ossification_seq %>% group_by(group) %>% group_split()
-View(ossification_seq_groups)
-
-ossification_seq_Mysticeti <- ossification_seq_groups[[1]]
-ossification_seq_Odontoceti <- ossification_seq_groups[[2]]
-
-#Palettes
-mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
-image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-
-mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
-                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,])
-image(1:7, 1, as.matrix(1:7), col = mypalette_Mysticeti, xlab = "Mysticeti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-
-mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
-                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,])
-image(1:7, 1, as.matrix(1:7), col = mypalette_Odontoceti, xlab = "Odontoceti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-
-mypalette_earbones <- c(mypalette_Mysticeti[5], mypalette_Odontoceti[6], mypalette_tableau20[13:14],"#ffffff", mypalette_Odontoceti[2])
-image(1:6, 1, as.matrix(1:6), col = mypalette_earbones, xlab = "ear bones plots",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-#Images for plots
-myst <- readPNG("Data/myst.png")
-odont <- readPNG("Data/odont.png")
-
 #Make natural log relevant columns
-measuraments <- measuraments %>% mutate(BZW_log = log(BZW), bullaW_log  = log(bullaW), perioticW_log = log(perioticW))
+measuraments <- measuraments %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bullaL), bullaW_log  = log(bullaW), 
+                                        perioticL_log = log(perioticL), perioticW_log = log(perioticW))
 
+ossification_seq <- ossification_seq %>% mutate(TL_mm_log = log(TL_mm))
+
+growth_curve <- growth_curve %>% mutate(TL_mm_log = log(TL_mm))
+
+#Split groups growth data
+growth_curve_groups <- growth_curve %>% group_by(group) %>% group_split()
+View(growth_curve_groups)
+
+growth_curve_mysticeti <- growth_curve_groups[[1]]
+growth_curve_odontoceti <- growth_curve_groups[[2]]
+
+#Split taxa growth data
+growth_curve_taxa <- growth_curve %>% group_by(taxon) %>% group_split()
+View(growth_curve_taxa)
+
+growth_curve_B.bonaerensis <- growth_curve_taxa[[1]]
+growth_curve_B.physalus <- growth_curve_taxa[[2]]
+growth_curve_Ph.phocoena <- growth_curve_taxa[[3]]
+growth_curve_St.attenuata <- growth_curve_taxa[[4]]
+
+#Split taxa growth sequence stages
+ossification_seq_taxa <- ossification_seq %>% group_by(taxon) %>% group_split()
+View(ossification_seq_taxa)
+
+ossification_seq_B.bonaerensis <- ossification_seq_taxa[[1]]
+ossification_seq_B.physalus <- ossification_seq_taxa[[2]]
+ossification_seq_Ph.phocoena <- ossification_seq_taxa[[3]]
+ossification_seq_St.attenuata <- ossification_seq_taxa[[4]]
+
+#Split measurements dataset
 #Create 2 datasets, 1 for periotic and 1 for bulla
-bulla_meas <- measuraments %>% select(2:11, 15:16) %>% drop_na()  #getting rid of specimens without BZW
-periotic_meas  <- measuraments %>% drop_na() %>% select(2:8, 12:15, 17) #getting rid of specimens that do not have the periotic and BZW
+bulla_meas <- measuraments %>% select(2:8, 11:13)
+periotic_meas  <- measuraments %>% drop_na() %>% select(2:6, 9:11, 14:15) #getting rid of specimens that do not have the periotic
 
-#Divide data by group
+#Divide measurement data by group
 bulla_meas_groups <- bulla_meas %>% group_by(group) %>% group_split()
 
 bulla_meas_mysticeti <- bulla_meas_groups[[1]]
@@ -77,65 +76,161 @@ periotic_meas_groups <- periotic_meas %>% group_by(group) %>% group_split()
 periotic_meas_mysticeti <- periotic_meas_groups[[1]]
 periotic_meas_odontoceti <- periotic_meas_groups[[2]]
 
+#Divide measurement data by species
+bulla_meas_species <- bulla_meas %>% group_by(species) %>% group_split()
+View(bulla_meas_species)
+
+bulla_meas_B.bonaerensis <- bulla_meas_species[[1]]
+bulla_meas_B.acutorostrata <- bulla_meas_species[[2]]
+bulla_meas_B.physalus <- bulla_meas_species[[5]]
+bulla_meas_Ph.phocoena <- bulla_meas_species[[17]]
+bulla_meas_St.attenuata <- bulla_meas_species[[20]]
+#Combine 2 minke species
+bulla_meas_minke <- bind_rows(bulla_meas_B.bonaerensis, bulla_meas_B.acutorostrata)
+
+periotic_meas_species <- periotic_meas %>% group_by(species) %>% group_split()
+View(periotic_meas_species)
+
+periotic_meas_B.bonaerensis <- periotic_meas_species[[1]]
+periotic_meas_B.acutorostrata <- periotic_meas_species[[2]]
+periotic_meas_Ph.phocoena <- periotic_meas_species[[16]]
+periotic_meas_St.attenuata <- periotic_meas_species[[17]]
+#Combine 2 minke species
+periotic_meas_minke <- bind_rows(periotic_meas_B.bonaerensis, periotic_meas_B.acutorostrata)
+
+#Calculate % of growth
+
+#Get age at birth of all taxa
+growth_max_age <- growth_curve %>% group_by(taxon) %>% summarize(max_age = max(Age_months))
+growth_max_age
+
+#Make new column with % growth for each specimen in each species
+#Growth data
+growth_curve_B.bonaerensis <- growth_curve_B.bonaerensis %>% mutate(growth_max_age[1,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+growth_curve_B.physalus <- growth_curve_B.physalus %>% mutate(growth_max_age[2,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+
+growth_curve_Ph.phocoena <- growth_curve_Ph.phocoena %>% mutate(growth_max_age[3,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+growth_curve_St.attenuata <- growth_curve_St.attenuata  %>% mutate(growth_max_age[4,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+
+#Ossification sequence
+ossification_seq_B.bonaerensis <- ossification_seq_B.bonaerensis %>% mutate(growth_max_age[1,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+ossification_seq_B.physalus <- ossification_seq_B.physalus %>% mutate(growth_max_age[2,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+
+ossification_seq_Ph.phocoena <- ossification_seq_Ph.phocoena %>% mutate(growth_max_age[3,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+ossification_seq_St.attenuata <- ossification_seq_St.attenuata  %>% mutate(growth_max_age[4,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
+
+#Reform original dataset with added column Age_100 for plots
+ossification_seq <- bind_rows(ossification_seq_B.bonaerensis, ossification_seq_B.physalus,ossification_seq_Ph.phocoena,ossification_seq_St.attenuata)
+
+#Palettes
+mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
+image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
+                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,],mypalette_tableau20[16,], 
+                         mypalette_tableau20[18,], mypalette_tableau20[20,])
+image(1:10, 1, as.matrix(1:10), col = mypalette_Mysticeti, xlab = "Mysticeti",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
+                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,], mypalette_tableau20[15,], 
+                          mypalette_tableau20[17,], mypalette_tableau20[19,])
+image(1:10, 1, as.matrix(1:10), col = mypalette_Odontoceti, xlab = "Odontoceti",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+mypalette_earbones <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Odontoceti[1], mypalette_Odontoceti[6],mypalette_tableau20[13:14],"#ffffff", mypalette_Odontoceti[10])
+image(1:8, 1, as.matrix(1:8), col = mypalette_earbones, xlab = "ear bones plots",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+#Images for plots
+B.bonaerensis <- readPNG("Data/b.bona.png")
+B.physalus <- readPNG("Data/b.physalus.png")
+Ph.phocoena <- readPNG("Data/phocoena.png")
+St.attenuata <- readPNG("Data/stenella.png")
+
 #PLOTS FOR OSSIFICATION EVENTS ON GROWTH CURVE ----
 
 #Stages data frame for plot lines
-stages <- data.frame(Age_months = c(2, 9.25/2)) #embryo fixed to about 2 months
+stages <- data.frame(Age_months = c(2, 12/2), Age_100 = c(20,50)) #embryo fixed to about 2 months
 
+#Palette for fill bone type
+#Check order species and bones in dataset first
+as.factor(ossification_seq$bone)
+#Match with order species as selected from mypalette_earbones
+as.factor(growth_curve$taxon)
 
-#Plot data both groups with selected model, specimens and events
-ossification_earbones <- ggplot(ossification_seq, aes(y = TL_m, x = Age_months, xend = 1, shape = state, fill = bone, color = Group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 5)+ 
-  stat_smooth(data = mysticeti_growth_curve, aes(y = TL_m, x = Age_months), method = lm, formula = y ~ poly(x, 2, raw = TRUE)-1, se = F, 
+mypalette_earbones_fill <- c(mypalette_earbones[2],mypalette_earbones[1], mypalette_earbones[3:4], 
+                             mypalette_earbones[7],mypalette_earbones[7],mypalette_earbones[7],mypalette_earbones[7])
+
+#Plot data species with selected model, specimens and events - % gestation to make plot better
+ossification_earbones <- ggplot(ossification_seq, aes(y = TL_mm, x = Age_100, xend = 1, shape = state,  fill = bone, color = taxon)) + #xend useful to make sure graphs goes close to 0
+  geom_point(size = 4)+ 
+  stat_smooth(data = growth_curve_B.bonaerensis, aes(y = TL_mm, x = Age_100), method = lm, formula = y ~ poly(x, 2, raw = TRUE)-1, se = F, 
               inherit.aes = F, fullrange = T,
               linetype = 1, colour = mypalette_earbones[1], show.legend = F)+
-  stat_smooth(data = odontoceti_growth_curve, aes(y = TL_m, x = Age_months), method = lm, formula = y ~ x, se = F, 
+  stat_smooth(data = growth_curve_B.physalus, aes(y = TL_mm, x = Age_100), method = lm, formula = y ~ poly(x, 2, raw = TRUE)-1, se = F, 
               inherit.aes = F, fullrange = T,
-              linetype = 2, colour = mypalette_earbones[2], show.legend = F)+ 
-  scale_color_manual(values = mypalette_earbones[1:2])+
+              linetype = 1, colour = mypalette_earbones[2], show.legend = F)+
+  stat_smooth(data = growth_curve_Ph.phocoena, aes(y = TL_mm, x = Age_100), method = lm, formula = y ~ x, se = F, 
+              inherit.aes = F, fullrange = T,
+              linetype = 2, colour = mypalette_earbones[3], show.legend = F)+ 
+  stat_smooth(data = growth_curve_St.attenuata, aes(y = TL_mm, x = Age_100), method = lm, formula = y ~ x, se = F, 
+              inherit.aes = F, fullrange = T,
+              linetype = 2, colour = mypalette_earbones[4], show.legend = F)+ 
+  scale_color_manual(values = mypalette_earbones[1:4])+
   scale_shape_manual(name = "Events", labels  = c("bulla/periotic visible", "processes of bulla/periotic ossified", "bulla/periotic completely ossified"), 
                                                   values = c(21, 22, 24))+
-  scale_fill_manual(values = c(mypalette_earbones[1],mypalette_earbones[2],mypalette_earbones[5],mypalette_earbones[5]),  name = "Element", labels = c("Bulla", "Periotic"))+
-  
-  geom_vline(data = stages, aes(xintercept = Age_months), color = mypalette_earbones[3], linetype = 4)+
+  scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Bulla", "Periotic"))+
+  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[5], linetype = 4)+
   theme_bw()+
-  xlab("Age (months)")+
-  ylab("Total Length (m)")+
+  xlab("Age (% gestation)")+
+  ylab("Total Length (mm)")+
   ggtitle("Ossification stages ear bones")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "vertical")+
-  guides(fill = guide_legend(override.aes = list(fill = c("black","white"), shape = 21)), colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))
+  guides(fill = guide_legend(override.aes = list(fill = c("black","white"), shape = 21)), 
+         colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))
 ossification_earbones <- move_layers(ossification_earbones, "GeomPoint", position = "top")
 ossification_earbones
 
 #Add annotations growth stages
 ossification_earbones <- ossification_earbones + 
-  annotate("text", x = 1, y = 2.8, label = "embryo", fontface = "italic", size = 4)+
-  annotate("text", x = 3.5, y = 2.8, label = "early fetus", fontface = "italic", size = 4)+
-  annotate("text", x = 6.5, y = 2.8, label = "late fetus", fontface = "italic", size = 4)
+  annotate("text", x = 10, y = 5400, label = "embryo", fontface = "italic", size = 4)+
+  annotate("text", x = 35, y = 5400, label = "early fetus", fontface = "italic", size = 4)+
+  annotate("text", x = 65, y = 5400, label = "late fetus", fontface = "italic", size = 4)
+ossification_earbones
 
 #Add silhouettes groups
 ossification_earbones <- ossification_earbones + 
-  add_phylopic(myst, alpha = 1, x = 6, y = 2, ysize = 0.6, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 7.5, y = 0.1, ysize = 0.5, color = mypalette_earbones[2])
+  add_phylopic(B.bonaerensis, alpha = 1, x = 80, y = 2800, ysize = 600, color = mypalette_earbones[1])+
+  add_phylopic(B.physalus, alpha = 1, x = 65, y = 4000, ysize = 600, color = mypalette_earbones[2])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 90, y = 200, ysize = 700, color = mypalette_earbones[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 90, y = 1300, ysize = 600, color = mypalette_earbones[4])
 ossification_earbones
 
 #Plot log data both groups with selected model, specimens and events
-ossification_earbones_log <- ggplot(ossification_seq, aes(y = TL_mm_log, x = Age_months, xend = 1, shape = state, fill = bone, color = Group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 5)+ 
-  stat_smooth(data = mysticeti_growth_curve, aes(y = TL_mm_log, x = Age_months), method = lm, formula = y ~ x, se = F, 
+ossification_earbones_log <- ggplot(ossification_seq, aes(y = TL_mm_log, x = Age_100, xend = 1, shape = state, fill = bone, color = taxon)) + #xend useful to make sure graphs goes close to 0
+  geom_point(size = 4)+ 
+  stat_smooth(data = growth_curve_B.bonaerensis, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
                inherit.aes = F, fullrange = T,
               linetype = 1, colour = mypalette_earbones[1], show.legend = F)+
-  stat_smooth(data = odontoceti_growth_curve, aes(y = TL_mm_log, x = Age_months), method = lm, formula = y ~ x, se = F, 
+  stat_smooth(data = growth_curve_B.physalus, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
                inherit.aes = F, fullrange = F,
-              linetype = 2, colour = mypalette_earbones[2], show.legend = F)+ 
-  scale_color_manual(values = mypalette_earbones[1:2])+
+              linetype = 1, colour = mypalette_earbones[2], show.legend = F)+ 
+  stat_smooth(data = growth_curve_Ph.phocoena, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
+              inherit.aes = F, fullrange = T,
+              linetype = 2, colour = mypalette_earbones[3], show.legend = F)+
+  stat_smooth(data = growth_curve_St.attenuata, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
+              inherit.aes = F, fullrange = T,
+              linetype = 2, colour = mypalette_earbones[4], show.legend = F)+
+  scale_color_manual(values = mypalette_earbones[1:4])+
   scale_shape_manual(name = "Events", labels  = c("bulla/periotic visible", "processes of bulla/periotic ossified", "bulla/periotic completely ossified"), 
                      values = c(21, 22, 24))+
-  scale_fill_manual(values = c(mypalette_earbones[1],mypalette_earbones[2],mypalette_earbones[5],mypalette_earbones[5]),  name = "Element", labels = c("Bulla", "Periotic"))+
-  geom_vline(data = stages, aes(xintercept = Age_months), color = mypalette_earbones[3], linetype = 4)+
+  scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Bulla", "Periotic"))+
+  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[5], linetype = 4)+
   theme_bw()+
-  xlab("Age (months)")+
-  ylab("Log (Total Length)")+
+  xlab("Age (% gestation)")+
+  ylab("Log(Total Length)")+
   ggtitle("Ossification stages ear bones")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "vertical")+
   guides(fill = guide_legend(override.aes = list(fill = c("black","white"), shape = 21)), colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))
@@ -144,14 +239,17 @@ ossification_earbones_log
 
 #Add annotations growth stages
 ossification_earbones_log <- ossification_earbones_log + 
-  annotate("text", x = 1, y = 3.35, label = "embryo", fontface = "italic", size = 4)+
-  annotate("text", x = 3.2, y = 3.35, label = "early fetus", fontface = "italic", size = 4)+
-  annotate("text", x = 5.7, y = 3.35, label = "late fetus", fontface = "italic", size = 4)
+  annotate("text", x = 10, y = 8.6, label = "embryo", fontface = "italic", size = 4)+
+  annotate("text", x = 35, y = 8.6, label = "early fetus", fontface = "italic", size = 4)+
+  annotate("text", x = 65, y = 8.6, label = "late fetus", fontface = "italic", size = 4)
+ossification_earbones_log
 
 #Add silhouettes groups
 ossification_earbones_log <- ossification_earbones_log + 
-  add_phylopic(myst, alpha = 1, x = 3.2, y = 2.8, ysize = 0.55, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 6, y = 2.1, ysize = 0.48, color = mypalette_earbones[2])
+  add_phylopic(B.bonaerensis, alpha = 1, x = 85, y = 8, ysize = 4.2, color = mypalette_earbones[1])+
+  add_phylopic(B.physalus, alpha = 1, x = 15, y = 6.5, ysize = 4.8, color = mypalette_earbones[2])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 85, y = 6, ysize = 6, color = mypalette_earbones[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 25, y = 4, ysize = 4.5, color = mypalette_earbones[4])
 ossification_earbones_log
 
 #ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH GROUP (2-way ANOVA) ----
