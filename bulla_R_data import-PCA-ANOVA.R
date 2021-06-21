@@ -41,19 +41,28 @@ ordination_scores <- read.table("Data/_gpsa_ordination_projections_bulla_R.RData
 ordination_scores$code <- classifiers$code
 
 #Import ordination values (PCOORD axis values from GPSA software) into R - amount of variation represented by each axis, for plot
-ordination_values <- read.table("Data/_gpsa_ordination_values_bulla_R.RData")
+ordination_values <- read.table("Data/_gpsa_ordination_values_bulla_R.RData", header = T)
+#Check
+glimpse(ordination_values)
 
-#Make new columns with % or variation for each axis and cumulative variation - useful for plots and if axes need to be excluded later
-ordination_values <- ordination_values %>% mutate(total_values = colSums(ordination_values[1]))  %>% 
-  mutate(values_100 = (singular_values*100/total_values)) %>% #percentage of variation described by each axis
-  mutate(values_cum = cumsum(values_100)) #cumulative variation of that axis plus all the variation described by the previous ones
+#Make new columns with % of variation for each axis and cumulative variation - useful for plots and if axes need to be excluded later
+ordination_values <- ordination_values %>% 
+  mutate(values_100 = (pro*100)) %>% #percentage of variation described by each axis
+  mutate(values_cum = (cum*100)) #cumulative variation of that axis plus all the variation described by the previous ones
+#Check
+glimpse(ordination_values)
 
-##Order classifiers by stage, useful for plot legend
+#Sink values to file in more readable format
+sink("bulla_R/ordination_values.txt", append = F)
+print(ordination_values )
+sink()
+
+##Order classifiers by category, useful for plot legend
 #Make factor for variable
-classifiers$stage <- factor(classifiers$stage, 
-                            levels = c("earlyFetus", "lateFetus", "neonate", "juvenile", "adult")) #copy from string printed with the code above
+classifiers$category <- factor(classifiers$category, 
+                            levels = c("early", "late", "born")) 
 #Order
-classifiers <- classifiers[order(classifiers$stage),]
+classifiers <- classifiers[order(classifiers$category),]
 #Check
 glimpse(classifiers)
 
@@ -62,17 +71,27 @@ classifiers$code
 
 #Make factor for variable
 raw_dat$code <- factor(raw_dat$code, #check levels below from string printed with the code above
-                       levels = c("Bf1",   "Ff1",    "Gf1" , "Hf3"  , "Hf4"  , "Mf1" ,  "Sf1" ,  "Sf2"  , "Delf1" ,"Delf2", "Delf3", "Lagf1","Lagf2", "Monf1" ,"Phof1" ,"Af3" ,  "Af4" , "Af5" ,  "Af6",  
-                                  "Af7",   "Af8",   "Mf2",   "Ddef1",  "Ddef2",  "Lagf3", "Neof1", "Staf1", 
-                                  "Gn1",   "Mn1",   "Pn1",   "Glon1", "Stan1", "Phoj1", "Staj1", "Staj2", "Staj3", "Laga1", "Phoa1")) 
+                       levels = c("Be3" ,  "Bf1"  , "Ff1"  , "Ff3" ,  "Ff4" ,  "Ff5"  , "Ff6" ,  "Ff7" ,  "Gf1"  , "Hf3" ,  "Hf4"  , "Hf6"  ,
+                                  "Hf8",   "Hf9" ,  "Mf1",   "Sf1"  , "Sf2"  , "Wf1" ,  "Delf1",
+                                  "Delf2" ,"Delf3", "Gloe1" ,"Glof1", "Glof2" ,"Kogf1" ,"Kogf2" ,"Lagf1", "Lagf2", "Monf1", "Monf2", "Phof1" ,
+                                  "Phof3" ,"Phof4", "Phof5", "Phof6", "Phye1" ,"Phye2", "Phye3",
+                                  "Phyf2", "Psef1", "Staf2", "Staf3", "Staf4", "Staf5", "Ttrf1" ,"Af3" ,  "Af4" ,  "Af5" ,  "Af6" , "Af7" ,  
+                                  "Af8"  , "Mf2",   "Ddef1" ,"Ddef2", "Glof3" ,"Glof4" ,"Lagf3",
+                                  "Neof1", "Phof7", "Phof8" ,"Phof9", "Staf1", "Staf6" ,"Ttrf2" ,"Gn1" ,  "Mn1" ,  "Pn1",   "Laga1" ,"Phoa1", 
+                                  "Phoa2" ,"Phoa3", "Staj1", "Stan1" ,"Stln1", "Stln2")) 
 #Order
 raw_dat <- raw_dat[order(raw_dat$code),]
 
 #Order ordination scores to match classifiers - same list as above
 ordination_scores$code <- factor(ordination_scores$code, #check levels below from string printed with the code above
-                                 levels = c("Bf1",   "Ff1",    "Gf1" , "Hf3"  , "Hf4"  , "Mf1" ,  "Sf1" ,  "Sf2"  , "Delf1" ,"Delf2", "Delf3", "Lagf1","Lagf2", "Monf1" ,"Phof1" ,"Af3" ,  "Af4" , "Af5" ,  "Af6",  
-                                            "Af7",   "Af8",   "Mf2",   "Ddef1",  "Ddef2",  "Lagf3", "Neof1", "Staf1", 
-                                            "Gn1",   "Mn1",   "Pn1",   "Glon1", "Stan1", "Phoj1", "Staj1", "Staj2", "Staj3", "Laga1", "Phoa1")) 
+                                 levels = c("Be3" ,  "Bf1"  , "Ff1"  , "Ff3" ,  "Ff4" ,  "Ff5"  , "Ff6" ,  "Ff7" ,  "Gf1"  , "Hf3" ,  "Hf4"  , "Hf6"  ,
+                                            "Hf8",   "Hf9" ,  "Mf1",   "Sf1"  , "Sf2"  , "Wf1" ,  "Delf1",
+                                            "Delf2" ,"Delf3", "Gloe1" ,"Glof1", "Glof2" ,"Kogf1" ,"Kogf2" ,"Lagf1", "Lagf2", "Monf1", "Monf2", "Phof1" ,
+                                            "Phof3" ,"Phof4", "Phof5", "Phof6", "Phye1" ,"Phye2", "Phye3",
+                                            "Phyf2", "Psef1", "Staf2", "Staf3", "Staf4", "Staf5", "Ttrf1" ,"Af3" ,  "Af4" ,  "Af5" ,  "Af6" , "Af7" ,  
+                                            "Af8"  , "Mf2",   "Ddef1" ,"Ddef2", "Glof3" ,"Glof4" ,"Lagf3",
+                                            "Neof1", "Phof7", "Phof8" ,"Phof9", "Staf1", "Staf6" ,"Ttrf2" ,"Gn1" ,  "Mn1" ,  "Pn1",   "Laga1" ,"Phoa1", 
+                                            "Phoa2" ,"Phoa3", "Staj1", "Stan1" ,"Stln1", "Stln2")) 
 #Order
 ordination_scores <- ordination_scores[order(ordination_scores$code),]
 
@@ -86,18 +105,26 @@ ordination_scores <- remove_rownames(ordination_scores) #remove automatic row na
 ordination_scores<- data.frame(column_to_rownames(ordination_scores, var = "code")) #adding row names to data frame
 has_rownames(ordination_scores) #check that now it has rownames
 
+## save objects for later analysis
 #Save specimens code as object
 specimens <- row.names(raw_dat)
 
-#Save growth stages as factor, useful for later analysis
-stages <- classifiers$stage
+#Save growth categories as factor, useful for later analysis
+categories <- classifiers$category
 
 #Save groups as factor, useful for later analysis
 groups <- classifiers$group
 
+#Save taxa as factor, useful for later analysis
+taxa <- classifiers$taxon
+
+##Make natural log relevant columns
+classifiers <- classifiers %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bullaL), bullaW_log  = log(bullaW), 
+                                        perioticL_log = log(perioticL), perioticW_log = log(perioticW))
+
 #Transform in 3D array, first number is number of landmarks, second is dimensions (3)
 #To find the number of landmark points, divide the number of variables in raw_dat - visible in Environment - by 3
-shape_array <- arrayspecs(raw_dat, 16747 , #number in raw_dat divided by 3
+shape_array <- arrayspecs(raw_dat, 24953 , #number in raw_dat divided by 3
                           3) #number of dimensions
 
 #Calculate mean shape coordinates
@@ -106,30 +133,47 @@ mean_shape <- mshape(shape_array)
 ##Make data frame for analyses in geomorph
 gdf <- geomorph.data.frame(coords = shape_array, 
                            code = classifiers$code, group = classifiers$group, 
-                           stage = classifiers$stage, category = classifiers$category,
+                           category = classifiers$category, taxon = classifiers$taxon, BZW_log = classifiers$BZW_log,
                            bulla_log = classifiers$bullaL_log, periotic_log = classifiers$perioticL_log)
 glimpse(gdf)
 
 #Check for specimens that are outliers - if they are very young specimens it is expected
 plotOutliers(gdf$coords)
-#Save PDF to output folder using menu in bar on the right
+#Save PDF/image to output folder using menu in bar on the right
 
 ##Make palette with ggthemes - color and/or shapes
-#Palette from ggthemes_data
-mypalette <- ggthemes_data[["tableau"]][["color-palettes"]][["ordered-sequential"]][["Blue"]][["value"]]
+#Palettes from ggthemes_data
+mypalette_blue <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["ordered-sequential"]][["Blue"]][["value"]])
+image(1:20, 1, as.matrix(1:20), col = mypalette_blue, xlab = "Blue",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
+image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-#Choose colors for growth stages and image to check
-mypalette <- as.matrix(mypalette)
-project_palette <- c(mypalette[3,], mypalette[7,], mypalette[11,], mypalette[15,], mypalette[19,])
-image(1:5, 1, as.matrix(1:5), col = project_palette, xlab = "Project palette", ylab = "", yaxt = "n")
+#Palette for 4 best sampled taxa - B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#same colors/taxa as growth and allometry project
+mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
+                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,],mypalette_tableau20[16,], 
+                         mypalette_tableau20[18,], mypalette_tableau20[20,])
+image(1:10, 1, as.matrix(1:10), col = mypalette_Mysticeti, xlab = "Mysticeti",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
+                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,], mypalette_tableau20[15,], 
+                          mypalette_tableau20[17,], mypalette_tableau20[19,])
+image(1:10, 1, as.matrix(1:10), col = mypalette_Odontoceti, xlab = "Odontoceti",
+      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+mypalette_taxa <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Odontoceti[1], mypalette_Odontoceti[6])
+mypalette_taxa_image <- image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
+                                  ylab = "", xaxt = "n", yaxt = "n", bty = "n")
+
+#Palette for categories - early, late, born
+mypalette_category <- c(mypalette_blue[3,], mypalette_blue[7,], mypalette_blue[11,])
+mypalette_category_image <- image(1:3, 1, as.matrix(1:3), col = mypalette_category, xlab = "categories colors - early, late, born", ylab = "", yaxt = "n")
 
 #Create shape palette for groups
 shapes <- c(15,19) #these are a square and a circle, use ?pch to see more shapes
-
-#Save the work
-#Press the "Save all documents open" double floppy disk above and run this code
-save.image("D:/Agnese/ear bones project/R/bulla_R/.RData")
-savehistory("D:/Agnese/ear bones project/R/bulla_R/.Rhistory")
 
 #CH. 3 - PCA COMPLETE DATASET ----
 
@@ -138,6 +182,25 @@ PCA_all <- gm.prcomp(gdf$coords)
 
 #List of PC components and proportion of variation
 PCA_all 
+
+#Sink list of PC component values to file and make it more readable in Word/Excel
+sink("bulla_R/PCA_all_values.txt", append = F)
+print(PCA_all)
+sink()
+#Word: replace all spaces as tabs, replace "Proportion of Variance" and Cumulative Proportion" as "Prop" and "Cum", save as new txt file
+#Excel: check file read well as table, copy and paste transposed data, save
+#Copy new edited file in Data folder after editing
+
+#Re-import PC component values in more readable format to make columns like ordination values
+PCA_all_values <- read.table("Data/PCA_all_values2.txt", header = T)
+PCA_all_values
+
+#Make new columns with % of variation for each axis and cumulative variation - useful for plots and if axes need to be excluded later
+PCA_all_values <- PCA_all_values %>% 
+  mutate(values_100 = (Prop*100)) %>% #percentage of variation described by each axis
+  mutate(values_cum = (Cum*100)) #cumulative variation of that axis plus all the variation described by the previous ones
+#Check
+glimpse(PCA_all_values)
 
 ##View basic R plot to check - use to copy values for PC1 of PC2 axes
 PCA_all_plot <- plot(PCA_all, main = "PCA all data",  pch = 21, #title and type of point to be used
@@ -166,7 +229,7 @@ PCA_all_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specime
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments
+                      values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
@@ -188,10 +251,10 @@ glimpse(hulls_all)
 PCA_all_hulls_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, fill = stage))+
   geom_point(size = 3, aes(shape = group))+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments
+                      values = mypalette_category)+            #legend and color adjustments
   geom_polygon(data = hulls_all, aes(x = x, y = y, fill = stage), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
   scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"),
-                    values =  project_palette)+ #must match scale_colour_manual
+                    values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
@@ -214,10 +277,10 @@ glimpse(hulls_all_category)
 PCA_all_category_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
   geom_point(size = 3, aes(shape = group))+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(project_palette[1:2], project_palette[4]))+            #legend and color adjustments
+                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
   geom_polygon(data = hulls_all_category, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
   scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
-                    values =  c(project_palette[1:2], project_palette[4]))+ #must match scale_colour_manual
+                    values =  c(mypalette_category[1:2], mypalette_category[4]))+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
@@ -241,7 +304,7 @@ pcscores_all_postnatal <- pcscores_all_stages[[1]]
 
 #Nice PCA plot with groups early fetus
 PCA_all_earlyfetus_ggplot <- ggplot(pcscores_all_earlyfetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
-  geom_point(size = 3, color = project_palette[1])+
+  geom_point(size = 3, color = mypalette_category[1])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
@@ -255,7 +318,7 @@ PCA_all_earlyfetus_ggplot
 
 #Nice PCA plot with groups late fetus
 PCA_all_latefetus_ggplot <- ggplot(pcscores_all_latefetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
-  geom_point(size = 3, color = project_palette[2])+
+  geom_point(size = 3, color = mypalette_category[2])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
@@ -272,7 +335,7 @@ PCA_all_postnatal_ggplot <- ggplot(pcscores_all_postnatal, aes(x = Comp1, y = Co
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_colour_manual(name = "Growth stage", labels =  c("Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette[3:5])+            #legend and color adjustments
+                      values = mypalette_category[3:5])+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
@@ -360,7 +423,7 @@ allometry_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, label = 
               colour = "darkblue", fill = 'gainsboro', linetype = "dashed", size = 0.5)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3)+       #points after, so they are on top
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments          
+                      values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
   xlab("Ln(Bulla length)")+
@@ -395,7 +458,7 @@ ordination_scores_ggplot <- ggplot(ordination_scores, aes(x = axis1, y = axis2, 
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments
+                      values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("I (29.3%)")+ #copy this from ordination values_100 column printed before
@@ -425,7 +488,7 @@ allometry_group_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, la
               colour = "darkblue", fill = 'gainsboro', size = 0.5, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3)+       #points after, so they are on top
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments          
+                      values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
   xlab("Ln(Bulla length)")+

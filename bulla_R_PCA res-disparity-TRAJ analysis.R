@@ -48,7 +48,7 @@ PCA_res_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specime
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments
+                      values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
@@ -70,10 +70,10 @@ glimpse(hulls_res)
 PCA_res_hulls_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, fill = stage))+
   geom_point(size = 3, aes(shape = group))+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette)+            #legend and color adjustments
+                      values = mypalette_category)+            #legend and color adjustments
   geom_polygon(data = hulls_res, aes(x = x, y = y, fill = stage), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
   scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"),
-                    values =  project_palette)+ #must match scale_colour_manual
+                    values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
@@ -96,10 +96,10 @@ glimpse(hulls_res_category)
 PCA_res_category_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
   geom_point(size = 3, aes(shape = group))+
   scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(project_palette[1:2], project_palette[4]))+            #legend and color adjustments
+                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
   geom_polygon(data = hulls_res_category, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
   scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
-                    values =  c(project_palette[1:2], project_palette[4]))+ #must match scale_colour_manual
+                    values =  c(mypalette_category[1:2], mypalette_category[4]))+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
@@ -123,7 +123,7 @@ pcscores_res_postnatal <- pcscores_res_stages[[3]]
 
 #Nice PCA plot with groups early fetus
 PCA_res_earlyfetus_ggplot <- ggplot(pcscores_res_earlyfetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
-  geom_point(size = 3, color = project_palette[1])+
+  geom_point(size = 3, color = mypalette_category[1])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
@@ -137,7 +137,7 @@ PCA_res_earlyfetus_ggplot
 
 #Nice PCA plot with groups late fetus
 PCA_res_latefetus_ggplot <- ggplot(pcscores_res_latefetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
-  geom_point(size = 3, color = project_palette[2])+
+  geom_point(size = 3, color = mypalette_category[2])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
@@ -154,7 +154,7 @@ PCA_res_postnatal_ggplot <- ggplot(pcscores_res_postnatal, aes(x = Comp1, y = Co
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_colour_manual(name = "Growth stage", labels =  c("Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = project_palette[3:5])+            #legend and color adjustments
+                      values = mypalette_category[3:5])+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
@@ -334,7 +334,7 @@ group_trajectory_ggplot <- ggplot(group_trajectory_pcscores, aes(x = PC1, y = PC
                                                            xend = x[6], yend = y[6], colour = age), #postnatalOdont
                colour = "gray17", size = 1, linejoin = 'mitre', linetype = 2, arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"))+
   scale_colour_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(project_palette[1:2], project_palette[4]))+            #legend and color adjustments
+                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
   xlab("PC 1 (58.42%)")+ #copy this from standard trajectory plot
