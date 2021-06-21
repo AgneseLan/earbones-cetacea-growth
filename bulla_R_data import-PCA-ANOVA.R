@@ -18,6 +18,10 @@ library(ggthemes)
 library(ggpubr)
 library(ggplotify)
 library(Morpho)
+library(rphylopic)
+library(png)
+library(gridExtra)
+
 
 #CH.2 - DATA IMPORT AND PREP ----
 
@@ -66,7 +70,7 @@ classifiers <- classifiers[order(classifiers$category),]
 #Check
 glimpse(classifiers)
 
-#Order shape data by stage to match classifiers
+#Order shape data by category to match classifiers
 classifiers$code
 
 #Make factor for variable
@@ -122,6 +126,16 @@ taxa <- classifiers$taxon
 classifiers <- classifiers %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bullaL), bullaW_log  = log(bullaW), 
                                         perioticL_log = log(perioticL), perioticW_log = log(perioticW))
 
+##Create object with classifiers only for the best sampled taxa - useful later in analyses
+#Create vector with the names of the best sampled taxa
+#B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+best_taxa <- c("B.acutorostrata", "B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata")
+
+#Create new classifiers object
+classifiers_taxa <- classifiers %>% filter(taxon %in% best_taxa)
+#Replace to have only 1 taxon name for minkes
+classifiers_taxa[classifiers_taxa == "B.acutorostrata"] <- "B.bonaerensis"
+
 #Transform in 3D array, first number is number of landmarks, second is dimensions (3)
 #To find the number of landmark points, divide the number of variables in raw_dat - visible in Environment - by 3
 shape_array <- arrayspecs(raw_dat, 24953 , #number in raw_dat divided by 3
@@ -140,6 +154,30 @@ glimpse(gdf)
 #Check for specimens that are outliers - if they are very young specimens it is expected
 plotOutliers(gdf$coords)
 #Save PDF/image to output folder using menu in bar on the right
+
+##Make data frame for only best sampled taxa
+#Search for row numbers for each taxon
+best_taxa_rows <- c(
+  which(classifiers[,4] == "B.acutorostrata"),
+  which(classifiers[,4] == "B.bonaerensis"),
+  which(classifiers[,4] == "B.physalus"),
+  which(classifiers[,4] == "Ph.phocoena"),
+  which(classifiers[,4] == "St.attenuata"))
+#Display list of row numbers that do not contain these taxa in order
+omit <- as.vector(setdiff(1:75, best_taxa_rows)) 
+
+#Make new shape array eliminating rows of other taxa from shape array
+shape_array_taxa <- shape_array[,,-omit]
+
+#Calculate mean shape coordinates
+mean_shape_taxa <- mshape(shape_array_taxa) 
+
+#Make new gdf with classifiers for these taxa only
+gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_taxa$code, group = classifiers_taxa$group, 
+                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon,
+                                bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
+glimpse(gdf_taxa)
+
 
 ##Make palette with ggthemes - color and/or shapes
 #Palettes from ggthemes_data
@@ -169,11 +207,17 @@ mypalette_taxa_image <- image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab
                                   ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
 #Palette for categories - early, late, born
-mypalette_category <- c(mypalette_blue[3,], mypalette_blue[7,], mypalette_blue[11,])
+mypalette_category <- c(mypalette_blue[3,], mypalette_blue[9,], mypalette_blue[16,])
 mypalette_category_image <- image(1:3, 1, as.matrix(1:3), col = mypalette_category, xlab = "categories colors - early, late, born", ylab = "", yaxt = "n")
 
 #Create shape palette for groups
 shapes <- c(15,19) #these are a square and a circle, use ?pch to see more shapes
+
+##Images for plots
+B.bonaerensis <- readPNG("Data/b.bona.png")
+B.physalus <- readPNG("Data/b.physalus.png")
+Ph.phocoena <- readPNG("Data/phocoena.png")
+St.attenuata <- readPNG("Data/stenella.png")
 
 #CH. 3 - PCA COMPLETE DATASET ----
 
@@ -202,6 +246,10 @@ PCA_all_values <- PCA_all_values %>%
 #Check
 glimpse(PCA_all_values)
 
+##Compare values between PCA and PCOORD (ordination) - make sure proportion of the first few axes is very similar
+glimpse(ordination_values)
+glimpse(PCA_all_values)
+
 ##View basic R plot to check - use to copy values for PC1 of PC2 axes
 PCA_all_plot <- plot(PCA_all, main = "PCA all data",  pch = 21, #title and type of point to be used
                      col = "deeppink",   #border of points
@@ -221,86 +269,62 @@ pcscores_all <- PCA_all$x
 #Read PC scores as tibble
 pcscores_all <- as_tibble(pcscores_all)
 #Add labels and other attributes to tibble as columns
-pcscores_all <- pcscores_all %>% mutate(specimens = gdf$code, stage = gdf$stage, group = gdf$group, category = gdf$category)
+pcscores_all <- pcscores_all %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(pcscores_all)
 
-#Nice PCA plot with stages and groups
-PCA_all_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, shape = group))+
+#Nice PCA plot with category and groups
+PCA_all_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, shape = group))+
   geom_point(size = 3)+
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60)+
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
   ggtitle("PCA all data")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_all_ggplot
 
-#Make hulls for PCA plot with hulls around growth stages
+#Make hulls for PCA plot with hulls around growth category
 hulls_all <- pcscores_all %>%
-  group_by(stage) %>%
+  group_by(category) %>%
   slice(chull(Comp1, Comp2)) %>%
   rename(x = Comp1, y = Comp2)
 glimpse(hulls_all)
 
-#Nice PCA plot with hulls around stages
-PCA_all_hulls_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, fill = stage))+
+#Nice PCA plot with hulls around categories
+PCA_all_hulls_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
   geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
-  geom_polygon(data = hulls_all, aes(x = x, y = y, fill = stage), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"),
+  geom_polygon(data = hulls_all, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Growth category", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
                     values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
   ggtitle("PCA all data")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5)) +
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_all_hulls_ggplot  
 
-#Make hulls for PCA plot with hulls around categories (3 stages: early fetus, late fetus, postnatal)
-hulls_all_category <- pcscores_all %>%
-  group_by(category) %>%
-  slice(chull(Comp1, Comp2)) %>%
-  rename(x = Comp1, y = Comp2)
-glimpse(hulls_all_category)
+##Plots for each category ----
+#PCA plots for each category
+#Create one tibble for each category
+#First split between categories
+pcscores_all_category <- pcscores_all %>% group_by(category) %>% group_split()
+#Check order
+View(pcscores_all_category)
 
-#Nice PCA plot with hulls around categories (3 stages: early fetus, late fetus, postnatal)
-PCA_all_category_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
-  geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
-  geom_polygon(data = hulls_all_category, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
-                    values =  c(mypalette_category[1:2], mypalette_category[4]))+ #must match scale_colour_manual
-  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
-  theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
-  ggtitle("PCA all data")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5))+
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)
-
-#Visualize plot and save as PDF using menu in bar on the right
-PCA_all_category_ggplot
-
-##PCA plot for each stage
-#Create one tibble for each stage
-#First split between stages
-pcscores_all_stages <- pcscores_all %>% group_by(category) %>% group_split()
-
-#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for all 3 postnatal stages (neonate, juvenile, adult)
-pcscores_all_earlyfetus <- pcscores_all_stages[[2]]
-pcscores_all_latefetus <- pcscores_all_stages[[3]]
-pcscores_all_postnatal <- pcscores_all_stages[[1]]
+#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for all 3 postnatal category (neonate, juvenile, adult)
+pcscores_all_earlyfetus <- pcscores_all_category[[1]]
+pcscores_all_latefetus <- pcscores_all_category[[2]]
+pcscores_all_postnatal <- pcscores_all_category[[3]]
 
 #Nice PCA plot with groups early fetus
 PCA_all_earlyfetus_ggplot <- ggplot(pcscores_all_earlyfetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
@@ -308,8 +332,8 @@ PCA_all_earlyfetus_ggplot <- ggplot(pcscores_all_earlyfetus, aes(x = Comp1, y = 
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
   ggtitle("PCA early fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -322,8 +346,8 @@ PCA_all_latefetus_ggplot <- ggplot(pcscores_all_latefetus, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
   ggtitle("PCA late fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -331,23 +355,87 @@ PCA_all_latefetus_ggplot <- ggplot(pcscores_all_latefetus, aes(x = Comp1, y = Co
 PCA_all_latefetus_ggplot
 
 #Nice PCA plot with groups postnatal
-PCA_all_postnatal_ggplot <- ggplot(pcscores_all_postnatal, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, shape = group))+
-  geom_point(size = 3)+
+PCA_all_postnatal_ggplot <- ggplot(pcscores_all_postnatal, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
+  geom_point(size = 3, color = mypalette_category[3])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth stage", labels =  c("Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = mypalette_category[3:5])+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (20.16%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (12.8%)")+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
   ggtitle("PCA postnatal")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_all_postnatal_ggplot
 
+##Plots for well sampled taxa only ----
+##PCA plot including only the 4 well sampled taxa
+#Create one tibble with the 4 taxa
+#First split between all taxa
+pcscores_all_taxon <- pcscores_all %>% group_by(taxon) %>% group_split()
+#Check order
+levels(as.factor(pcscores_all$taxon))
 
-##Regression PC1 and PC2 vs bulla length - check if size an important factor in results overall
+#Save as separate tibbles - 1 for each taxon
+pcscores_all_B.acutorostrata <- pcscores_all_taxon[[1]]
+pcscores_all_B.bonaerensis <- pcscores_all_taxon[[2]]
+pcscores_all_B.physalus <- pcscores_all_taxon[[5]]
+pcscores_all_Ph.phocoena <- pcscores_all_taxon[[17]]
+pcscores_all_St.attenuata <- pcscores_all_taxon[[20]]
+#Combine 2 minkes in 1 tibble
+pcscores_all_minke <- bind_rows(pcscores_all_B.acutorostrata, pcscores_all_B.bonaerensis)
+#Replace to have only 1 taxon name
+pcscores_all_minke[pcscores_all_minke == "B.acutorostrata"] <- "B.bonaerensis"
+glimpse(pcscores_all_minke)
+
+#Make 1 tibble to include only the selected taxa
+pcscores_taxa <- bind_rows(pcscores_all_minke, pcscores_all_B.physalus, pcscores_all_Ph.phocoena, pcscores_all_St.attenuata)
+
+#Nice PCA plot with groups early fetus
+PCA_taxa_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, shape = group, colour = taxon, alpha = category, label = specimens))+
+  geom_point(size = 3)+
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  theme_bw()+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
+  ggtitle("PCA selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
+
+#Visualize plot and save as PDF using menu in bar on the right
+PCA_taxa_ggplot
+
+#Make hulls for PCA plot with hulls around taxa
+hulls_taxa <- pcscores_taxa %>%
+  group_by(taxon) %>%
+  slice(chull(Comp1, Comp2)) %>%
+  rename(x = Comp1, y = Comp2)
+glimpse(hulls_taxa)
+
+#Nice PCA plot with hulls around categories
+PCA_taxa_hulls_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, colour = taxon, alpha = category))+
+  geom_point(size = 3, aes(shape = group))+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  geom_polygon(data = hulls_taxa, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_bw()+
+  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (7.14%)")+
+  ggtitle("PCA selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+#Visualize plot and save as PDF using menu in bar on the right
+PCA_taxa_hulls_ggplot  
+
+##Regression PC1 and PC2 vs bulla length ----
+#Check if size an important factor in results overall
 #Create data frame with data
 pcscores_all_size <- pcscores_all %>% mutate(size = gdf$bulla_log)
 
@@ -360,24 +448,18 @@ summary(reg_PC1all_size)
 summary(reg_PC2all_size)
 
 #Save results of significant regression to file
-sink("Output/PC1all_size_lm.txt")
-print(summary(reg_PC1all_size))
+sink("bulla_R/PC1-PC2_size_lm.txt")
+print("PC1")
+summary(reg_PC1all_size)
+
+print("PC2")
+summary(reg_PC2all_size)
 sink() 
-#Repeat for each significance regression
-sink("Output/PC2all_size_lm.txt")
-print(summary(reg_PC2all_size))
-sink() 
 
+#CH. 4 - ALLOMETRY ----
+##Evaluate allometry and get the allometry-free shapes using log bulla length
 
-#Save the work
-#Press the "Save all documents open" double floppy disk above and run this code
-save.image("D:/Agnese/ear bones project/R/bulla_R/.RData")
-savehistory("D:/Agnese/ear bones project/R/bulla_R/.Rhistory")
-
-#CH. 4 - ALLOMETRY CORRECTION ----
-##Evaluate allometry and get the allometry-free shapes using ln bulla length
-#Important if PCs highly correlated with size
-
+##Allometry entire daatset ----
 #Regression shape on size
 allometry <- procD.lm(coords ~ bulla_log, data = gdf, iter=999, print.progress = TRUE) 
 
@@ -385,8 +467,8 @@ allometry <- procD.lm(coords ~ bulla_log, data = gdf, iter=999, print.progress =
 summary(allometry)
 
 #Save results of significant regression to file
-sink("Output/allometry_shape_size.txt")
-print(summary(allometry))
+sink("bulla_R/allometry_all.txt")
+summary(allometry)
 sink() 
 
 #Create residuals array to then save as coordinates for analyses
@@ -400,7 +482,8 @@ mean_shape_residuals <- mshape(allometry_residuals)
 
 #Regression score of shape vs bulla length or periotic length  - regression method with "RegScore" plotting
 allometry_plot_regscore <- plot(allometry, type = "regression",predictor = gdf$bulla_log, reg.type = "RegScore",
-                                main = "Shape vs Ln(bulla length)",xlab = "Ln(bulla length)", pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
+                                main = "Shape vs Ln(bulla length)",xlab = "Ln(bulla length)", 
+                                pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
 
 ##Add regression line with confidence intervals to plot
 #Create object to use for linear model
@@ -409,37 +492,129 @@ allometry_regscores <- allometry_plot_regscore[["RegScore"]]
 ##Make better allometry plot with ggplot
 #Create data frame object that ggplot can read - use data from plot object you want to improve
 allometry_plot <- data.frame(size = allometry_plot_regscore[["plot.args"]][["x"]], RegScores = allometry_plot_regscore[["plot.args"]][["y"]])
-allometry_plot
 
 #Convert data frame to tibble
 allometry_plot <- as_tibble(allometry_plot)
 #Add labels and other attributes to tibble as columns
-allometry_plot <- allometry_plot %>% mutate(specimens = gdf$code, stage = gdf$stage, group = gdf$group, category = gdf$category)
+allometry_plot <- allometry_plot %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(allometry_plot)
 
 #Nice plot with specimens colored by age AND regression line with confidence intervals
-allometry_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, label = specimens, colour = stage, shape = group))+
+allometry_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, colour = category, shape = group))+
   geom_smooth(aes(x = size, y = RegScores), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
               colour = "darkblue", fill = 'gainsboro', linetype = "dashed", size = 0.5)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3)+       #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Ln(Bulla length)")+
+  xlab("Log(Bulla length)")+
   ylab("Regression Score")+
   ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
-  theme(plot.title = element_text(face = "bold", hjust = 0.5))+
-  geom_text_repel(colour = "black", size = 3.5,          #label last so that they are on top of fill
-                  force_pull = 3, point.padding = 1)     #position of tables relative to point (proximity and distance) 
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_ggplot
 
-#Save the work
-#Press the "Save all documents open" double floppy disk above and run this code
-save.image("D:/Agnese/ear bones project/R/bulla_R/.RData")
-savehistory("D:/Agnese/ear bones project/R/bulla_R/.Rhistory")
+##Allometry well sampled taxa only ----
+#Regression shape on size
+allometry_taxa <- procD.lm(coords ~ bulla_log, data = gdf_taxa, iter=999, print.progress = TRUE) 
+
+#Check results and p-value for significance
+summary(allometry_taxa)
+
+#Save results of significant regression to file
+sink("bulla_R/allometry_taxa.txt")
+summary(allometry_taxa)
+sink() 
+
+#Create residuals array to then save as coordinates for analyses
+allometry_array_taxa <- arrayspecs(allometry_taxa$residuals,p = dim(gdf_taxa$coords)[1], k = dim(gdf_taxa$coords)[2]) 
+
+#New shapes adjusted for allometry with CS to use in analyses
+allometry_residuals_taxa <- allometry_array_taxa + array(mean_shape_taxa, dim(allometry_array_taxa)) 
+
+#Save mean shape of allometry-adjusted shapes to use in a analyses
+mean_shape_residuals <- mshape(allometry_residuals)
+
+#Regression score of shape vs bulla length or periotic length  - regression method with "RegScore" plotting
+allometry_plot_regscore_taxa <- plot(allometry_taxa, type = "regression",predictor = gdf_taxa$bulla_log, reg.type = "RegScore",
+                                main = "Shape vs Ln(bulla length)",xlab = "Ln(bulla length)", 
+                                pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
+
+##Add regression line with confidence intervals to plot
+#Create object to use for linear model
+allometry_regscores_taxa <- allometry_plot_regscore_taxa[["RegScore"]] 
+
+##Make better allometry plot with ggplot
+#Create data frame object that ggplot can read - use data from plot object you want to improve
+allometry_plot_taxa <- data.frame(size = allometry_plot_regscore_taxa[["plot.args"]][["x"]], 
+                                  RegScores = allometry_plot_regscore_taxa[["plot.args"]][["y"]])
+
+#Convert data frame to tibble
+allometry_plot_taxa <- as_tibble(allometry_plot_taxa)
+#Add labels and other attributes to tibble as columns
+allometry_plot_taxa <- allometry_plot_taxa %>% mutate(specimens = gdf_taxa$code, taxon = gdf_taxa$taxon, 
+                                                      group = gdf_taxa$group, category = gdf_taxa$category)
+glimpse(allometry_plot_taxa)
+
+#Nice plot with specimens colored by age AND regression line with confidence intervals
+allometry_taxa_ggplot <- ggplot(allometry_plot_taxa, aes(x = size, y = RegScores, colour = category, shape = group))+
+  geom_smooth(aes(x = size, y = RegScores), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
+              colour = "darkblue", fill = 'gainsboro', linetype = "dashed", size = 0.5)+ #should be straight regression line with confidence interval in grey
+  geom_point(size = 3)+       #points after, so they are on top
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
+                      values = mypalette_category)+            #legend and color adjustments          
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_classic(base_size = 12)+
+  xlab("Log(Bulla length)")+
+  ylab("Regression Score")+
+  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+#Visualize plot and save as PDF using menu in bar on the right
+allometry_taxa_ggplot
+
+#Nice plot with specimens colored by taxon AND regression lines for each taxon with confidence intervals
+allometry_taxa_ggplot_taxon <- ggplot(allometry_plot_taxa, aes(x = size, y = RegScores, colour = taxon, shape = group))+
+  geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
+              alpha = 0.3, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
+  geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
+  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa), #select colors from palette from taxa
+                     aesthetics = c("color","fill"))+          
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_classic(base_size = 12)+
+  xlab("Log(Bulla length)")+
+  ylab("Regression Score")+
+  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+#Visualize plot and save as PDF using menu in bar on the right
+allometry_taxa_ggplot_taxon
+
+#Nice plot with specimens colored by taxon AND regression lines for each taxon with confidence intervals no legend but phylopic
+allometry_taxa_ggplot_taxon_nolegend <- ggplot(allometry_plot_taxa, aes(x = size, y = RegScores, colour = taxon, shape = group))+
+  geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
+              alpha = 0.3, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
+  geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
+  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa), #select colors from palette from taxa
+                     aesthetics = c("color","fill"))+          
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_classic(base_size = 12)+
+  xlab("Log(Bulla length)")+
+  ylab("Regression Score")+
+  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none")
+#Add silhouettes taxa
+allometry_taxa_ggplot_taxon_nolegend <- allometry_taxa_ggplot_taxon_nolegend  + 
+  add_phylopic(B.bonaerensis, alpha = 1, x = 3.9, y = -4, ysize = 2.6, color = mypalette_taxa[1])+
+  add_phylopic(B.physalus, alpha = 1, x = 3.3, y = 9.5, ysize = 2.6, color = mypalette_taxa[2])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 2.2, y = 0, ysize = 3.2, color = mypalette_taxa[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.3, y = -15, ysize = 2.7, color = mypalette_taxa[4])
+
+#Visualize plot and save as PDF using menu in bar on the right
+allometry_taxa_ggplot_taxon_nolegend
+
 
 #CH. 5 - ORDINATION PLOT ----
 
@@ -447,17 +622,17 @@ savehistory("D:/Agnese/ear bones project/R/bulla_R/.Rhistory")
 #Transform ordination scores as tibble
 ordination_scores <- as_tibble(ordination_scores)
 #Add labels and other attributes to tibble as columns
-ordination_scores <- ordination_scores %>% mutate(specimens = gdf$code, stage = gdf$stage, group = gdf$group)
+ordination_scores <- ordination_scores %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group)
 glimpse(ordination_scores)
 
 #Recall values to copy for plot axis labels - use values_100 column for the first 2 axes
 ordination_values
 
 #Nice plot - axis 1 and 2
-ordination_scores_ggplot <- ggplot(ordination_scores, aes(x = axis1, y = axis2, label = specimens, colour = stage, shape = group))+
+ordination_scores_ggplot <- ggplot(ordination_scores, aes(x = axis1, y = axis2, label = specimens, colour = category, shape = group))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
@@ -483,11 +658,11 @@ summary(allometry_group_anova)
 sink() 
 
 #Plot of allometry with group differences - use previous reg scores
-allometry_group_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, label = specimens, colour = stage, shape = group))+
+allometry_group_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, label = specimens, colour = category, shape = group))+
   geom_smooth(aes(x = size, y = RegScores, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
               colour = "darkblue", fill = 'gainsboro', size = 0.5, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3)+       #points after, so they are on top
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
@@ -519,48 +694,48 @@ allometry_models_anova
 sink() 
 
 ##Conduct ANOVA to test if there is significant shape variation among groups for each category
-#Are shapes in each group different from the other groups at different growth stages?
+#Are shapes in each group different from the other groups at different growth category?
 #2 analyses, use shape data and pc scores
 #Shapes
-#Make 3 data frames, 1 for each category - the numbers are the rows corresponding to specimens at that growth stage
+#Make 3 data frames, 1 for each category - the numbers are the rows corresponding to specimens at that growth category
 gdf_earlyfetus <- geomorph.data.frame(coords = shape_array[,,1:15], 
                                       code = classifiers$code[1:15], group = classifiers$group[1:15], 
-                                      stage = classifiers$stage[1:15], category = classifiers$category[1:15],
+                                      category = classifiers$category[1:15], category = classifiers$category[1:15],
                                       bulla_log = classifiers$bullaL_log[1:15], periotic_log = classifiers$perioticL_log[1:15])
 glimpse(gdf_earlyfetus)
 
 gdf_latefetus <- geomorph.data.frame(coords = shape_array[,,16:27], 
                                      code = classifiers$code[16:27], group = classifiers$group[16:27], 
-                                     stage = classifiers$stage[16:27], category = classifiers$category[16:27],
+                                     category = classifiers$category[16:27], category = classifiers$category[16:27],
                                      bulla_log = classifiers$bullaL_log[16:27], periotic_log = classifiers$perioticL_log[16:27])
 glimpse(gdf_latefetus)
 
 gdf_postnatal <- geomorph.data.frame(coords = shape_array[,,28:38], 
                                      code = classifiers$code[28:38], group = classifiers$group[28:38], 
-                                     stage = classifiers$stage[28:38], category = classifiers$category[28:38],
+                                     category = classifiers$category[28:38], category = classifiers$category[28:38],
                                      bulla_log = classifiers$bullaL_log[28:38], periotic_log = classifiers$perioticL_log[28:38])
 glimpse(gdf_postnatal)
 
 #Make separate dataframe to check shape is not different postnatal in odontocetes
 gdf_postnatal_odont <- geomorph.data.frame(coords = shape_array[,,31:38], 
                                            code = classifiers$code[31:38], group = classifiers$group[31:38], 
-                                           stage = classifiers$stage[31:38], category = classifiers$category[31:38],
+                                           category = classifiers$category[31:38], category = classifiers$category[31:38],
                                            bulla_log = classifiers$bullaL_log[31:38], periotic_log = classifiers$perioticL_log[31:38])
 glimpse(gdf_postnatal_odont)
 
-#Start by making sure it is ok to lump postnatal stages with ANOVA of shape per stage in postnatal odontocetes
-shape_stage_odont_anova <- procD.lm(coords ~ stage, iter = 999, data = gdf_postnatal_odont, RRPP = F)
+#Start by making sure it is ok to lump postnatal category with ANOVA of shape per category in postnatal odontocetes
+shape_category_odont_anova <- procD.lm(coords ~ category, iter = 999, data = gdf_postnatal_odont, RRPP = F)
 
 #Check results - should not be significant
-summary(shape_stage_odont_anova)
+summary(shape_category_odont_anova)
 
 #Save results to file
-sink("Output/shape_stage_odont_anova.txt")
-summary(shape_stage_odont_anova)
-anova(shape_stage_odont_anova)
+sink("Output/shape_category_odont_anova.txt")
+summary(shape_category_odont_anova)
+anova(shape_category_odont_anova)
 sink() 
 
-#Proceed with shape differences between groups for each stage
+#Proceed with shape differences between groups for each category
 #Early fetus
 shape_group_earlyfetus_anova <- procD.lm(coords ~ group, iter = 999, data = gdf_earlyfetus, RRPP = F)
 
@@ -598,7 +773,7 @@ anova(shape_group_postnatal_anova)
 sink() 
 
 #PC scores
-#Repeat same analyses but using pc scores for each stage
+#Repeat same analyses but using pc scores for each category
 #Early fetus
 pcscores_group_earlyfetus_anova <- procD.lm(pcscores_all_earlyfetus[1:38] #this number is the number of Components from the PCA, make sure it is correct by calling PCA_all$x
                                             ~ group, iter = 999, data = pcscores_all_earlyfetus, RRPP = F)

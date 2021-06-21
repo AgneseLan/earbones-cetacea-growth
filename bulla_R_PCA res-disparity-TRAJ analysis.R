@@ -40,7 +40,7 @@ pcscores_res <- PCA_residuals$x
 #Read PC scores as tibble
 pcscores_res <- as_tibble(pcscores_res)
 #Add labels and other attributes to tibble as columns
-pcscores_res <- pcscores_res %>% mutate(specimens = gdf$code, stage = gdf$stage, group = gdf$group, category = gdf$category)
+pcscores_res <- pcscores_res %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(pcscores_res)
 
 #Nice PCA plot with stages and groups
