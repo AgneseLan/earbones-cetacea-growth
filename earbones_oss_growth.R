@@ -1,4 +1,6 @@
-#LOAD LIBRARIES ----
+## OSSIFICATION AND ALLOMETRY EAR BONES IN ONTOGENY ##
+
+#CH. 1 - LOAD LIBRARIES ----
 library(tidyr)
 library(dplyr)
 library(tidyverse)
@@ -18,15 +20,22 @@ library(png)
 library(gridExtra)
 
 
-#DATA IMPORT ----
-#Import data
+#CH. 2 - DATA IMPORT ----
+
+##Import data
+#Ossification sequence data for the 4 best sampled taxa:
+#B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 ossification_seq <- read_csv("Data/earbones_ossification_events.csv")
 ossification_seq$state <-  as.character(ossification_seq$state)
 
-measuraments <- read_csv("Data/measuraments.csv")
-
+#Growth curve data for the 4 best sampled taxa:
+#B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 growth_curve <- read_csv("Data/growth_data.csv")
 
+#Measurements of BZW (bizygomatic width), bulla length and width, periotic length and width for complete dataset
+measuraments <- read_csv("Data/measuraments.csv")
+
+##Transform and arrange data for analysis
 #Make natural log relevant columns
 measuraments <- measuraments %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bullaL), bullaW_log  = log(bullaW), 
                                         perioticL_log = log(perioticL), perioticW_log = log(perioticW))
@@ -35,6 +44,7 @@ ossification_seq <- ossification_seq %>% mutate(TL_mm_log = log(TL_mm))
 
 growth_curve <- growth_curve %>% mutate(TL_mm_log = log(TL_mm))
 
+#Split growth curve dataset
 #Split groups growth data
 growth_curve_groups <- growth_curve %>% group_by(group) %>% group_split()
 View(growth_curve_groups)
@@ -51,6 +61,7 @@ growth_curve_B.physalus <- growth_curve_taxa[[2]]
 growth_curve_Ph.phocoena <- growth_curve_taxa[[3]]
 growth_curve_St.attenuata <- growth_curve_taxa[[4]]
 
+#Split ossification sequence dataset
 #Split taxa growth sequence stages
 ossification_seq_taxa <- ossification_seq %>% group_by(taxon) %>% group_split()
 View(ossification_seq_taxa)
@@ -65,7 +76,7 @@ ossification_seq_St.attenuata <- ossification_seq_taxa[[4]]
 bulla_meas <- measuraments %>% select(2:8, 11:13)
 periotic_meas  <- measuraments %>% drop_na() %>% select(2:6, 9:11, 14:15) #getting rid of specimens that do not have the periotic
 
-#Divide measurement data by group
+#Split measurement data by group - not used currently
 bulla_meas_groups <- bulla_meas %>% group_by(group) %>% group_split()
 
 bulla_meas_mysticeti <- bulla_meas_groups[[1]]
@@ -76,7 +87,7 @@ periotic_meas_groups <- periotic_meas %>% group_by(group) %>% group_split()
 periotic_meas_mysticeti <- periotic_meas_groups[[1]]
 periotic_meas_odontoceti <- periotic_meas_groups[[2]]
 
-##Divide measurement data by species
+##Split measurement data by species
 #Bulla
 bulla_meas_species <- bulla_meas %>% group_by(taxon) %>% group_split()
 View(bulla_meas_species)
@@ -114,7 +125,7 @@ periotic_meas_minke
 periotic_meas_taxa <- bind_rows(periotic_meas_minke, periotic_meas_Ph.phocoena, periotic_meas_St.attenuata)
 periotic_meas_taxa 
 
-##Calculate % of growth
+##Calculate % of growth for growth curve and ossification sequence datasets - improve plots as different taxa have different gestation times
 #Get age at birth of all taxa
 growth_max_age <- growth_curve %>% group_by(taxon) %>% summarize(max_age = max(Age_months))
 growth_max_age
@@ -134,10 +145,10 @@ ossification_seq_B.physalus <- ossification_seq_B.physalus %>% mutate(growth_max
 ossification_seq_Ph.phocoena <- ossification_seq_Ph.phocoena %>% mutate(growth_max_age[3,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
 ossification_seq_St.attenuata <- ossification_seq_St.attenuata  %>% mutate(growth_max_age[4,2]) %>% mutate(Age_100 = (Age_months*100/max_age))
 
-#Reform original dataset with added column Age_100 for plots
+#Recreate original dataset with added column Age_100 for plots
 ossification_seq <- bind_rows(ossification_seq_B.bonaerensis, ossification_seq_B.physalus,ossification_seq_Ph.phocoena,ossification_seq_St.attenuata)
 
-#Palettes
+##Palettes
 mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
 image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
@@ -158,13 +169,14 @@ mypalette_earbones <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalett
 mypalette_earbones_image <- image(1:8, 1, as.matrix(1:8), col = mypalette_earbones, xlab = "ear bones plots",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-#Images for plots
+##Images for plots
 B.bonaerensis <- readPNG("Data/b.bona.png")
 B.physalus <- readPNG("Data/b.physalus.png")
 Ph.phocoena <- readPNG("Data/phocoena.png")
 St.attenuata <- readPNG("Data/stenella.png")
 
-#PLOTS FOR OSSIFICATION EVENTS ON GROWTH CURVE ----
+#CH. 3 - OSSIFICATION EVENTS IN ONTOGENY ----
+#Plot ossification events for both ear bones on growth curves
 
 #Stages data frame for plot lines
 stages <- data.frame(Age_months = c(2, 12/2), Age_100 = c(20,50)) #embryo fixed to about 2 months
@@ -267,7 +279,10 @@ ossification_earbones_log <- ossification_earbones_log +
   add_phylopic(St.attenuata, alpha = 1, x = 25, y = 4, ysize = 4.5, color = mypalette_earbones[4])
 ossification_earbones_log
 
-#ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH GROUP (2-way ANOVA) ----
+#CH. 4 - ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH GROUP (ANCOVA) ----
+#Differences in allometry between 2 main  groups of Cetacea (Mysticeti and Odontoceti), entire dataset used for bull and periotic
+#Natural log measurements to account for different sizes of taxa
+
 ##Create basic models with no interactions with groups for comparison
 allometry_bullaL_log <- lm(bullaL_log ~ BZW_log, data  = bulla_meas)
 allometry_bullaW_log <- lm(bullaW_log ~ BZW_log, data  = bulla_meas)
@@ -545,7 +560,12 @@ allometry_perioticW_log_int_plot
 #All best models plots together
 grid.arrange(allometry_bullaL_log_int_plot,  allometry_perioticL_log_int_plot, allometry_bullaW_log_int_plot, allometry_perioticW_log_int_plot)
 
-#ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH TAXON (2-way ANOVA) ----
+#CH. 5 - ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH TAXON (ANCOVA) ----
+#Differences in allometry between best sampled taxa in dataset,
+#for bulla: B.bonaerensis/acutorostrata (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#for periotic: B.bonaerensis/acutorostrata (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#Natural log measurements to account for different sizes of taxa
+
 ##Create basic models with no interactions with groups for comparison
 allometry_bullaL_log_taxa <- lm(bullaL_log ~ BZW_log, data  = bulla_meas_taxa)
 allometry_bullaW_log_taxa <- lm(bullaW_log ~ BZW_log, data  = bulla_meas_taxa)
@@ -841,433 +861,3 @@ grid.arrange(allometry_bullaL_log_int_taxa_plot,  allometry_perioticL_log_int_ta
              allometry_bullaW_log_int_taxa_plot, allometry_perioticW_log_int_taxa_plot)
 
 
-#USE LOG VALUES - ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH GROUP - NATURAL VALUES (2-way ANOVA) ----
-##Regression of natural values with group effect - check differences between groups
-allometry_BZW_bullaL_gp <- lm(bullaL ~ BZW * group, data  = bulla_meas)
-allometry_BZW_bullaW_gp <- lm(bullaW ~ BZW * group, data  = bulla_meas)
-allometry_BZW_perioticL_gp <- lm(perioticL ~ BZW * group, data  = periotic_meas)
-allometry_BZW_perioticW_gp <- lm(perioticW ~ BZW * group, data  = periotic_meas)
-
-#Check results
-summary(allometry_BZW_bullaL_gp)
-anova(allometry_BZW_bullaL_gp)
-summary(allometry_BZW_bullaW_gp)
-anova(allometry_BZW_bullaW_gp)
-summary(allometry_BZW_perioticL_gp)
-anova(allometry_BZW_perioticL_gp)
-summary(allometry_BZW_perioticW_gp)
-anova(allometry_BZW_perioticW_gp)
-
-#Plot diagnostics
-autoplot(allometry_BZW_bullaL_gp, smooth.colour = NA)
-autoplot(allometry_BZW_bullaW_gp, smooth.colour = NA)
-autoplot(allometry_BZW_perioticL_gp, smooth.colour = NA)
-autoplot(allometry_BZW_perioticW_gp, smooth.colour = NA)
-
-#Save regressions to file
-sink("Output/allometry_BZW_LW_gp-int.txt", append = F)
-print("Bulla length")
-print(summary(allometry_BZW_bullaL_gp))
-print(anova(allometry_BZW_bullaL_gp))
-
-print("Bulla width")
-print(summary(allometry_BZW_bullaW_gp))
-print(anova(allometry_BZW_bullaW_gp))
-
-print("Periotic length")
-print(summary(allometry_BZW_perioticL_gp))
-print(anova(allometry_BZW_perioticL_gp))
-
-print("Periotic width")
-print(summary(allometry_BZW_perioticW_gp))
-print(anova(allometry_BZW_perioticW_gp))
-sink()
-
-#Plot regression lines per group
-#Add confidence intervals
-#Create data for confidence intervals
-bullaL_newX <- expand.grid(BZW = seq(from = min(bulla_meas$BZW), to = max(bulla_meas$BZW), length.out = 30), #use min and max of x values (BZW) as limits and use number of specimens as length of sequence
-                           group = c("Mysticeti", "Odontoceti"))         #warp x_vals on values of x axis (BZW), add groupings
-bullaL_newY <- predict(allometry_BZW_bullaL_gp, newdata = bullaL_newX, interval="confidence",
-                       level = 0.95)
-#Make data frame of data for confidence intervals
-bullaL_conf_intervals <- data.frame(bullaL_newX, bullaL_newY)
-#Rename columns to match main plot tibble variables for x and y
-bullaL_conf_intervals <- rename(bullaL_conf_intervals, bullaL = fit)
-bullaL_conf_intervals
-
-#Plot
-allometry_BZW_bullaL_gp_plot <- ggplot(bulla_meas, aes(y = bullaL, x = BZW, fill = group, color = group)) +
-  geom_smooth(data = bullaL_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
-              size = 0.8, alpha = 0.2, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
-  geom_point(size = 3)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+         
-  theme_classic(base_size = 12)+
-  xlab("BZW (mm)")+
-  ylab("Bulla length (mm)")+
-  ggtitle ("BZW vs Bulla length by group - p-value < 0.001***")+  #copy from model summary
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12), legend.position = "none", legend.direction = "vertical", 
-        axis.title.x = element_text(vjust = -1), 
-        axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaL_gp_plot <- move_layers(allometry_BZW_bullaL_gp_plot, "GeomPoint", position = "top")
-allometry_BZW_bullaL_gp_plot <- allometry_BZW_bullaL_gp_plot + 
-  add_phylopic(myst, alpha = 1, x = 100, y = 60, ysize = 30, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 300, y = 20, ysize = 25, color = mypalette_earbones[2])
-
-#Add confidence intervals
-#Create data for confidence intervals
-bullaW_newX <- expand.grid(BZW = seq(from = min(bulla_meas$BZW), to = max(bulla_meas$BZW), length.out = 30), #use min and max of x values (BZW) as limits and use number of specimens as length of sequence
-                           group = c("Mysticeti", "Odontoceti"))         #warp x_vals on values of x axis (BZW), add groupings
-bullaW_newY <- predict(allometry_BZW_bullaW_gp, newdata = bullaW_newX, interval="confidence",
-                       level = 0.95)
-#Make data frame of data for confidence intervals
-bullaW_conf_intervals <- data.frame(bullaW_newX, bullaW_newY)
-#Rename columns to match main plot tibble variables for x and y
-bullaW_conf_intervals <- rename(bullaW_conf_intervals, bullaW = fit)
-bullaW_conf_intervals
-
-#Plot
-allometry_BZW_bullaW_gp_plot <- ggplot(bulla_meas, aes(y = bullaW, x = BZW, fill = group, color = group)) +
-  geom_smooth(data = bullaW_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
-              size = 0.8, alpha = 0.2, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
-  geom_point(size = 3)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+         
-  theme_classic(base_size = 12)+
-  xlab("BZW (mm)")+
-  ylab("Bulla width (mm)")+
-  ggtitle ("BZW vs Bulla width by group - p-value < 0.001***")+  #copy from model summary
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12), legend.position = "none", legend.direction = "vertical", 
-        axis.title.x = element_text(vjust = -1), 
-        axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaW_gp_plot <- move_layers(allometry_BZW_bullaW_gp_plot, "GeomPoint", position = "top")
-allometry_BZW_bullaW_gp_plot + 
-  add_phylopic(myst, alpha = 1, x = 100, y = 60, ysize = 30, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 300, y = 20, ysize = 25, color = mypalette_earbones[2])
-
-#Add confidence intervals
-#Create data for confidence intervals
-perioticL_newX <- expand.grid(BZW = seq(from = min(periotic_meas$BZW), to = max(periotic_meas$BZW), length.out = 21), #use min and max of x values (BZW) as limits and use number of specimens as length of sequence
-                              group = c("Mysticeti", "Odontoceti"))         #warp x_vals on values of x axis (BZW), add groupings
-perioticL_newY <- predict(allometry_BZW_perioticL_gp, newdata = perioticL_newX, interval="confidence",
-                          level = 0.95)
-#Make data frame of data for confidence intervals
-perioticL_conf_intervals <- data.frame(perioticL_newX, perioticL_newY)
-#Rename columns to match main plot tibble variables for x and y
-perioticL_conf_intervals <- rename(perioticL_conf_intervals, perioticL = fit)
-perioticL_conf_intervals
-
-#Plot
-allometry_BZW_perioticL_gp_plot <- ggplot(periotic_meas, aes(y = perioticL, x = BZW, fill = group, color = group)) +
-  geom_smooth(data = perioticL_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
-              size = 0.8, alpha = 0.2, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
-  geom_point(size = 3)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+         
-  theme_classic(base_size = 12)+
-  xlab("BZW (mm)")+
-  ylab("Periotic length (mm)")+
-  ggtitle ("BZW vs Periotic length by group - p-value < 0.001***")+  #copy from model summary
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12), legend.position = "none", legend.direction = "vertical", 
-        axis.title.x = element_text(vjust = -1), 
-        axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticL_gp_plot <- move_layers(allometry_BZW_perioticL_gp_plot, "GeomPoint", position = "top")
-allometry_BZW_perioticL_gp_plot + 
-  add_phylopic(myst, alpha = 1, x = 100, y = 60, ysize = 30, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 300, y = 20, ysize = 25, color = mypalette_earbones[2])
-
-#Add confidence intervals
-#Create data for confidence intervals
-perioticW_newX <- expand.grid(BZW = seq(from = min(periotic_meas$BZW), to = max(periotic_meas$BZW), length.out = 21), #use min and max of x values (BZW) as limits and use number of specimens as length of sequence
-                              group = c("Mysticeti", "Odontoceti"))         #warp x_vals on values of x axis (BZW), add groupings
-perioticW_newY <- predict(allometry_BZW_perioticW_gp, newdata = perioticW_newX, interval="confidence",
-                          level = 0.95)
-#Make data frame of data for confidence intervals
-perioticW_conf_intervals <- data.frame(perioticW_newX, perioticW_newY)
-#Rename columns to match main plot tibble variables for x and y
-perioticW_conf_intervals <- rename(perioticW_conf_intervals, perioticW = fit)
-perioticW_conf_intervals
-
-#Plot
-allometry_BZW_perioticW_gp_plot <- ggplot(periotic_meas, aes(y = perioticW, x = BZW, fill = group, color = group)) +
-  geom_smooth(data = perioticW_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
-              size = 0.8, alpha = 0.2, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
-  geom_point(size = 3)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+         
-  theme_classic(base_size = 12)+
-  xlab("BZW (mm)")+
-  ylab("Periotic width (mm)")+
-  ggtitle ("BZW vs Periotic width by group - p-value < 0.001*** (group p < 0.01 **)")+  #copy from model summary
-  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 11), legend.position = "none", legend.direction = "vertical", 
-        axis.title.x = element_text(vjust = -1), 
-        axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticW_gp_plot <- move_layers(allometry_BZW_perioticW_gp_plot, "GeomPoint", position = "top")
-allometry_BZW_perioticW_gp_plot <- allometry_BZW_perioticW_gp_plot + 
-  add_phylopic(myst, alpha = 1, x = 100, y = 40, ysize = 30, color = mypalette_earbones[1])+
-  add_phylopic(odont, alpha = 1, x = 300, y = 18, ysize = 25, color = mypalette_earbones[2])
-
-#Check if groups can be different only in size (intercept) and not slope
-allometry_BZW_bullaL_gp2 <- lm(bullaL ~ BZW + group, data  = bulla_meas)
-allometry_BZW_bullaW_gp2 <- lm(bullaW ~ BZW + group, data  = bulla_meas)
-allometry_BZW_perioticL_gp2 <- lm(perioticL ~ BZW + group, data  = periotic_meas)
-allometry_BZW_perioticW_gp2 <- lm(perioticW ~ BZW + group, data  = periotic_meas)
-
-#Check results
-summary(allometry_BZW_bullaL_gp2)
-anova(allometry_BZW_bullaL_gp2)
-summary(allometry_BZW_bullaW_gp2)
-anova(allometry_BZW_bullaW_gp2)
-summary(allometry_BZW_perioticL_gp2)
-anova(allometry_BZW_perioticL_gp2)
-summary(allometry_BZW_perioticW_gp2)
-anova(allometry_BZW_perioticW_gp2)
-
-#Save regressions to file
-sink("Output/allometry_BZW_LW_gp+.txt", append = F)
-print("Bulla length")
-print(summary(allometry_BZW_bullaL_gp2))
-print(anova(allometry_BZW_bullaL_gp2))
-
-print("Bulla width")
-print(summary(allometry_BZW_bullaW_gp2))
-print(anova(allometry_BZW_bullaW_gp2))
-
-print("Periotic length")
-print(summary(allometry_BZW_perioticL_gp2))
-print(anova(allometry_BZW_perioticL_gp2))
-
-print("Periotic width")
-print(summary(allometry_BZW_perioticW_gp2))
-print(anova(allometry_BZW_perioticW_gp2))
-sink()
-
-
-
-#USE 2-way ANOVA - ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH TAXON (LM) ----
-##Regression of natural values by group
-#Perform LM analysis to get p-values and coefficients of slope/intercept
-allometry_BZW_bullaL_mysticeti <- lm(bullaL ~ BZW, data  = bulla_meas_mysticeti)
-allometry_BZW_bullaL_odontoceti <- lm(bullaL ~ BZW, data = bulla_meas_odontoceti)
-
-allometry_BZW_bullaW_mysticeti <- lm(bullaW ~ BZW, data = bulla_meas_mysticeti)
-allometry_BZW_bullaW_odontoceti <- lm(bullaW ~ BZW, data = bulla_meas_odontoceti)
-
-allometry_BZW_perioticL_mysticeti <- lm(perioticL ~ BZW, data = periotic_meas_mysticeti)
-allometry_BZW_perioticL_odontoceti <- lm(perioticL ~ BZW, data  = periotic_meas_odontoceti)
-
-allometry_BZW_perioticW_mysticeti <- lm(perioticW ~ BZW, data  = periotic_meas_mysticeti)
-allometry_BZW_perioticW_odontoceti <- lm(perioticW ~ BZW, data  = periotic_meas_odontoceti)
-
-#Check results
-summary(allometry_BZW_bullaL_mysticeti)
-summary(allometry_BZW_bullaL_odontoceti)
-
-summary(allometry_BZW_bullaW_mysticeti)
-summary(allometry_BZW_bullaW_odontoceti)
-
-summary(allometry_BZW_perioticL_mysticeti)
-summary(allometry_BZW_perioticL_odontoceti)
-
-summary(allometry_BZW_perioticW_mysticeti)
-summary(allometry_BZW_perioticW_odontoceti)
-
-#Save regressions to file
-sink("Output/allometry_BZW_LW_myst+odont.txt", append = F)
-print("Bulla length")
-print(summary(allometry_BZW_bullaL_mysticeti))
-print(summary(allometry_BZW_bullaL_odontoceti))
-
-print("Bulla width")
-print(summary(allometry_BZW_bullaW_mysticeti))
-print(summary(allometry_BZW_bullaW_odontoceti))
-
-print("Periotic length")
-print(summary(allometry_BZW_perioticL_mysticeti))
-print(summary(allometry_BZW_perioticL_odontoceti))
-
-print("Periotic width")
-print(summary(allometry_BZW_perioticW_mysticeti))
-print(summary(allometry_BZW_perioticW_odontoceti))
-sink()
-
-#Plot diagnostic plots
-autoplot(allometry_BZW_bullaL_mysticeti, smooth.colour = NA)
-autoplot(allometry_BZW_bullaL_odontoceti, smooth.colour = NA)
-
-#Plot regressions for each bone-meas
-allometry_BZW_bullaL_plot <- ggplot(bulla_meas, aes(y = bullaL, x = BZW, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaL, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[1], alpha = 0.2,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaL, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[2], alpha = 0.2,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("BZW (mm)")+
-  ylab("Bulla length (mm)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaL_plot <- move_layers(allometry_BZW_bullaL, "GeomPoint", position = "top")
-allometry_BZW_bullaL_plot
-
-allometry_BZW_bullaW_plot <- ggplot(bulla_meas, aes(y = bullaW, x = BZW, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaW, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[1], alpha = 0.2,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaW, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[2], alpha = 0.2,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("BZW (mm)")+
-  ylab("Bulla width (mm)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaW_plot <- move_layers(allometry_BZW_bullaW, "GeomPoint", position = "top")
-allometry_BZW_bullaW_plot
-
-allometry_BZW_perioticL_plot <- ggplot(periotic_meas, aes(y = perioticL, x = BZW, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = periotic_meas_mysticeti, aes(y = perioticL, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[1], alpha = 0.2,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = periotic_meas_odontoceti, aes(y = perioticL, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[2], alpha = 0.2,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("BZW (mm)")+
-  ylab("Periotic length (mm)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticL_plot <- move_layers(allometry_BZW_perioticL, "GeomPoint", position = "top")
-allometry_BZW_perioticL_plot
-
-allometry_BZW_perioticW_plot <- ggplot(periotic_meas, aes(y = perioticW, x = BZW, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = periotic_meas_mysticeti, aes(y = perioticW, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[1], alpha = 0.2,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = periotic_meas_odontoceti, aes(y = perioticW, x = BZW), method = lm, formula = y ~ x, se = T, 
-              inherit.aes = F, fullrange = T, fill = mypalette_earbones[2], alpha = 0.2,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("BZW (mm)")+
-  ylab("Periotic width (mm)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticW_plot <- move_layers(allometry_BZW_perioticW, "GeomPoint", position = "top")
-allometry_BZW_perioticW_plot
-
-##Regression of log values by group
-#Perform LM analysis to get p-values and coefficients of slope/intercept
-allometry_BZW_bullaL_log_mysticeti <- lm(bullaL_log ~ BZW_log, data  = bulla_meas_mysticeti)
-allometry_BZW_bullaL_log_odontoceti <- lm(bullaL_log ~ BZW_log, data = bulla_meas_odontoceti)
-
-allometry_BZW_bullaW_log_mysticeti <- lm(bullaW_log ~ BZW_log, data = bulla_meas_mysticeti)
-allometry_BZW_bullaW_log_odontoceti <- lm(bullaW_log ~ BZW_log, data = bulla_meas_odontoceti)
-
-allometry_BZW_perioticL_log_mysticeti <- lm(perioticL_log ~ BZW_log, data = periotic_meas_mysticeti)
-allometry_BZW_perioticL_log_odontoceti <- lm(perioticL_log ~ BZW_log, data  = periotic_meas_odontoceti)
-
-allometry_BZW_perioticW_log_mysticeti <- lm(perioticW_log ~ BZW_log, data  = periotic_meas_mysticeti)
-allometry_BZW_perioticW_log_odontoceti <- lm(perioticW_log ~ BZW_log, data  = periotic_meas_odontoceti)
-
-#Check results
-summary(allometry_BZW_bullaL_log_mysticeti)
-summary(allometry_BZW_bullaL_log_odontoceti)
-
-summary(allometry_BZW_bullaW_log_mysticeti)
-summary(allometry_BZW_bullaW_log_odontoceti)
-
-summary(allometry_BZW_perioticL_log_mysticeti)
-summary(allometry_BZW_perioticL_log_odontoceti)
-
-summary(allometry_BZW_perioticW_log_mysticeti)
-summary(allometry_BZW_perioticW_log_odontoceti)
-
-#Save regressions to file
-sink("Output/allometry_BZW_LW_log_myst+odont.txt", append = F)
-print("Bulla length")
-print(summary(allometry_BZW_bullaL_log_mysticeti))
-print(summary(allometry_BZW_bullaL_log_odontoceti))
-
-print("Bulla width")
-print(summary(allometry_BZW_bullaW_log_mysticeti))
-print(summary(allometry_BZW_bullaW_log_odontoceti))
-
-print("Periotic length")
-print(summary(allometry_BZW_perioticL_log_mysticeti))
-print(summary(allometry_BZW_perioticL_log_odontoceti))
-
-print("Periotic width")
-print(summary(allometry_BZW_perioticW_log_mysticeti))
-print(summary(allometry_BZW_perioticW_log_odontoceti))
-sink()
-
-#Plot diagnostic plots
-autoplot(allometry_BZW_bullaL_log_mysticeti, smooth.colour = NA)
-autoplot(allometry_BZW_bullaL_log_odontoceti, smooth.colour = NA)
-
-#Plot regressions for each bone-meas - no SE
-allometry_BZW_bullaL_log_plot <- ggplot(bulla_meas, aes(y = bullaL_log, x = BZW_log, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("Log(BZW)")+
-  ylab("Log(Bulla length)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaL_log_plot <- move_layers(allometry_BZW_bullaL_log, "GeomPoint", position = "top")
-allometry_BZW_bullaL_log_plot
-
-allometry_BZW_bullaW_log_plot <- ggplot(bulla_meas, aes(y = bullaW_log, x = BZW_log, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("Log(BZW)")+
-  ylab("Log(Bulla width)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_bullaW_log_plot <- move_layers(allometry_BZW_bullaW_log, "GeomPoint", position = "top")
-allometry_BZW_bullaW_log_plot
-
-allometry_BZW_perioticL_log <- ggplot(periotic_meas, aes(y = perioticL_log, x = BZW_log, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("Log(BZW)")+
-  ylab("Log(Periotic length)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticL_log_plot <- move_layers(allometry_BZW_perioticL_log, "GeomPoint", position = "top")
-allometry_BZW_perioticL_log_plot
-
-allometry_BZW_perioticW_log_plot <- ggplot(periotic_meas, aes(y = perioticW_log, x = BZW_log, fill = group, color = group)) + #xend useful to make sure graphs goes close to 0
-  geom_point(size = 3)+ 
-  stat_smooth(data = bulla_meas_mysticeti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 1, colour = mypalette_earbones[1])+
-  stat_smooth(data = bulla_meas_odontoceti, aes(y = bullaL_log, x = BZW_log), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
-              linetype = 2, colour = mypalette_earbones[2])+ 
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = mypalette_earbones[1:2], aesthetics = c("color","fill"))+
-  theme_bw()+
-  xlab("Log(BZW)")+
-  ylab("Log(Periotic width)")+
-  theme(legend.direction = "vertical", axis.title.x = element_text(vjust = -1), axis.title.y = element_text(vjust = 2))
-allometry_BZW_perioticW_log_plot <- move_layers(allometry_BZW_perioticW_log, "GeomPoint", position = "top")
-allometry_BZW_perioticW_log_plot
