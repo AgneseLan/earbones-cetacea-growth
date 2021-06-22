@@ -391,7 +391,7 @@ glimpse(pcscores_all_minke)
 #Make 1 tibble to include only the selected taxa
 pcscores_taxa <- bind_rows(pcscores_all_minke, pcscores_all_B.physalus, pcscores_all_Ph.phocoena, pcscores_all_St.attenuata)
 
-#Nice PCA plot with groups early fetus
+#Nice PCA plot with only  well sampled taxa
 PCA_taxa_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, shape = group, colour = taxon, alpha = category, label = specimens))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
@@ -617,32 +617,120 @@ allometry_taxa_ggplot_taxon_nolegend
 
 
 #CH. 5 - ORDINATION PLOT ----
+#Plot the ordination scores from PCOORD imported from the GPSA
 
-#Plot the ordination scores imported from the GPSA
 #Transform ordination scores as tibble
 ordination_scores <- as_tibble(ordination_scores)
 #Add labels and other attributes to tibble as columns
-ordination_scores <- ordination_scores %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group)
+ordination_scores <- ordination_scores %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(ordination_scores)
 
 #Recall values to copy for plot axis labels - use values_100 column for the first 2 axes
-ordination_values
+glimpse(ordination_values)
 
 #Nice plot - axis 1 and 2
 ordination_scores_ggplot <- ggplot(ordination_scores, aes(x = axis1, y = axis2, label = specimens, colour = category, shape = group))+
   geom_point(size = 3)+
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 50)+
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("I (29.3%)")+ #copy this from ordination values_100 column printed before
-  ylab("II (17.8%)")+
+  xlab("I (15.79%)")+ #copy this from ordination values_100 column printed before
+  ylab("II (7.14%)")+
   ggtitle("PCOORD GPSA")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12))  #title font and position
 
 #Visualize plot and save as PDF using menu in bar on the right
 ordination_scores_ggplot
+
+##Plot well sampled taxa only ----
+
+#Create one tibble with the 4 taxa
+#First split between all taxa
+ordination_scores_taxon <- ordination_scores %>% group_by(taxon) %>% group_split()
+#Check order
+levels(as.factor(ordination_scores$taxon))
+
+#Save as separate tibbles - 1 for each taxon
+ordination_scores_B.acutorostrata <- ordination_scores_taxon[[1]]
+ordination_scores_B.bonaerensis <- ordination_scores_taxon[[2]]
+ordination_scores_B.physalus <- ordination_scores_taxon[[5]]
+ordination_scores_Ph.phocoena <- ordination_scores_taxon[[17]]
+ordination_scores_St.attenuata <- ordination_scores_taxon[[20]]
+#Combine 2 minkes in 1 tibble
+ordination_scores_minke <- bind_rows(ordination_scores_B.acutorostrata, ordination_scores_B.bonaerensis)
+#Replace to have only 1 taxon name
+ordination_scores_minke[ordination_scores_minke == "B.acutorostrata"] <- "B.bonaerensis"
+glimpse(ordination_scores_minke)
+
+#Make 1 tibble to include only the selected taxa
+ordination_scores_taxa <- bind_rows(ordination_scores_minke, ordination_scores_B.physalus, ordination_scores_Ph.phocoena, ordination_scores_St.attenuata)
+
+#Nice PCA plot with only  well sampled taxa
+ordination_scores_taxa_ggplot <- ggplot(ordination_scores_taxa, aes(x = axis1, y = axis2, shape = group, colour = taxon, alpha = category, label = specimens))+
+  geom_point(size = 3)+
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  theme_bw()+
+  xlab("I (15.79%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
+  ylab("II (7.14%)")+
+  ggtitle("PCOORD GPSA selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
+
+#Visualize plot and save as PDF using menu in bar on the right
+ordination_scores_taxa_ggplot
+
+#Make hulls for PCA plot with hulls around taxa
+hulls_ordination_scores_taxa <- ordination_scores_taxa %>%
+  group_by(taxon) %>%
+  slice(chull(axis1, axis2)) %>%
+  rename(x = axis1, y = axis2)
+glimpse(hulls_ordination_scores_taxa)
+
+#Nice PCA plot with hulls around categories
+ordination_scores_taxa_hulls_ggplot <- ggplot(ordination_scores_taxa, aes(x = axis1, y = axis2, colour = taxon, alpha = category))+
+  geom_point(size = 3, aes(shape = group))+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  geom_polygon(data = hulls_ordination_scores_taxa, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_bw()+
+  xlab("I (15.79%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
+  ylab("II (7.14%)")+
+  ggtitle("PCOORD GPSA selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+#Visualize plot and save as PDF using menu in bar on the right
+ordination_scores_taxa_hulls_ggplot  
+
+##Regression Axis1 and Axis2 vs bulla length ----
+#Check if size an important factor in results overall
+#Create data frame with data
+ordination_scores_size <- ordination_scores %>% mutate(size = gdf$bulla_log)
+
+#Calculate regression for each component
+reg_axis1_size <- lm(axis1 ~ size, data = ordination_scores_size)
+reg_axis2_size <- lm(axis2 ~ size, data = ordination_scores_size)
+
+#View results and p-value
+summary(reg_axis1_size)
+summary(reg_axis2_size)
+
+#Save results of significant regression to file
+sink("bulla_R/axis1-axis2_size_lm.txt")
+print("I")
+summary(reg_axis1_size)
+
+print("II")
+summary(reg_axis2_size)
+sink() 
 
 #CH. 6 - ANOVA SHAPE GROUPS  ----
 
