@@ -109,7 +109,7 @@ ordination_scores <- remove_rownames(ordination_scores) #remove automatic row na
 ordination_scores<- data.frame(column_to_rownames(ordination_scores, var = "code")) #adding row names to data frame
 has_rownames(ordination_scores) #check that now it has rownames
 
-## save objects for later analysis
+##Save objects for later analysis
 #Save specimens code as object
 specimens <- row.names(raw_dat)
 
@@ -135,6 +135,17 @@ best_taxa <- c("B.acutorostrata", "B.bonaerensis", "B.physalus", "Ph.phocoena", 
 classifiers_taxa <- classifiers %>% filter(taxon %in% best_taxa)
 #Replace to have only 1 taxon name for minkes
 classifiers_taxa[classifiers_taxa == "B.acutorostrata"] <- "B.bonaerensis"
+
+##Save objects for later analysis
+#Save growth categories as factor, useful for later analysis
+categories_taxa <- classifiers_taxa$category
+
+#Save groups as factor, useful for later analysis
+groups_taxa <- classifiers_taxa$group
+
+#Save taxa as factor, useful for later analysis
+taxa_taxa <- classifiers_taxa$taxon
+
 
 #Transform in 3D array, first number is number of landmarks, second is dimensions (3)
 #To find the number of landmark points, divide the number of variables in raw_dat - visible in Environment - by 3
@@ -274,7 +285,7 @@ pcscores_all <- as_tibble(pcscores_all)
 pcscores_all <- pcscores_all %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(pcscores_all)
 
-#Nice PCA plot with category and groups
+#Nice plot with labels and specimens colored by category
 PCA_all_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, shape = group))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60)+
@@ -323,7 +334,7 @@ pcscores_all_category <- pcscores_all %>% group_by(category) %>% group_split()
 #Check order
 View(pcscores_all_category)
 
-#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for all 3 postnatal category (neonate, juvenile, adult)
+#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for all postnatal
 pcscores_all_earlyfetus <- pcscores_all_category[[1]]
 pcscores_all_latefetus <- pcscores_all_category[[2]]
 pcscores_all_postnatal <- pcscores_all_category[[3]]
@@ -446,7 +457,7 @@ sink()
 #CH. 4 - ALLOMETRY ----
 ##Evaluate allometry and get the allometry-free shapes using log bulla length
 
-##Allometry entire daatset ----
+##Allometry entire dataset ----
 #Regression shape on size
 allometry <- procD.lm(coords ~ bulla_log, data = gdf, iter=999, print.progress = TRUE) 
 
@@ -471,10 +482,6 @@ mean_shape_residuals <- mshape(allometry_residuals)
 allometry_plot_regscore <- plot(allometry, type = "regression",predictor = gdf$bulla_log, reg.type = "RegScore",
                                 main = "Shape vs Ln(bulla length)",xlab = "Ln(bulla length)", 
                                 pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
-
-##Add regression line with confidence intervals to plot
-#Create object to use for linear model
-allometry_regscores <- allometry_plot_regscore[["RegScore"]] 
 
 ##Make better allometry plot with ggplot
 #Create data frame object that ggplot can read - use data from plot object you want to improve
@@ -511,27 +518,15 @@ allometry_taxa <- procD.lm(coords ~ bulla_log, data = gdf_taxa, iter=999, print.
 summary(allometry_taxa)
 
 #Save results of significant regression to file
-sink("bulla_R/allometry_taxa.txt")
+sink("bulla_R/allometry_taxa_shape.txt")
 summary(allometry_taxa)
 sink() 
-
-#Create residuals array to then save as coordinates for analyses
-allometry_array_taxa <- arrayspecs(allometry_taxa$residuals,p = dim(gdf_taxa$coords)[1], k = dim(gdf_taxa$coords)[2]) 
-
-#New shapes adjusted for allometry with CS to use in analyses
-allometry_residuals_taxa <- allometry_array_taxa + array(mean_shape_taxa, dim(allometry_array_taxa)) 
-
-#Save mean shape of allometry-adjusted shapes to use in a analyses
-mean_shape_residuals_taxa <- mshape(allometry_residuals_taxa)
 
 #Regression score of shape vs bulla length or periotic length  - regression method with "RegScore" plotting
 allometry_plot_regscore_taxa <- plot(allometry_taxa, type = "regression",predictor = gdf_taxa$bulla_log, reg.type = "RegScore",
                                 main = "Shape vs Ln(bulla length)",xlab = "Ln(bulla length)", 
                                 pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
 
-##Add regression line with confidence intervals to plot
-#Create object to use for linear model
-allometry_regscores_taxa <- allometry_plot_regscore_taxa[["RegScore"]] 
 
 ##Make better allometry plot with ggplot
 #Create data frame object that ggplot can read - use data from plot object you want to improve
@@ -706,7 +701,7 @@ sink()
 #CH. 6 - ANOVA OF SHAPE (pc scores) AND SIZE FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis  ----
 #Conduct ANOVA to test if there is significant difference in allometry between groups (Mysticeti, Odontoceti) or between each taxon
 #Also check if difference varies at different growth categories
-#Only well samped taxa used for more even sampling
+#Only well sampled taxa used for more even sampling
 
 #Create data frame of pc scores for well sampled taxa with size included
 pcscores_taxa_size <- pcscores_taxa %>% mutate(size = gdf_taxa$bulla_log)
@@ -719,7 +714,7 @@ allometry_pcscores_taxa <- procD.lm(pcscores_taxa_size[1:75] #number of PC compo
 summary(allometry_pcscores_taxa)
 
 ##Pairwise comparison of regression models between groups - all categories ----
-#Create 2 models, 1 with only intercpt varying (combination) and one with slope and intercept varying (interaction)
+#Create 2 models, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
 allometry_pcscores_taxa_group_comb <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size + pcscores_taxa_size$group,
                                                print.progress = FALSE, iter = 999)
 
@@ -841,29 +836,306 @@ allometry_pcscores_taxa_group_ggplot <- allometry_pcscores_taxa_group_ggplot   +
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_pcscores_taxa_group_ggplot
 
-
 ##Pairwise comparison of regression models between taxa - all categories ----
 ##Test if there is a significant difference between allometry general model and allometry considering taxa separately
 
-#FIXME
-#Copy from above, comb and int models
-#ANOVA
-#PAIRWISE
-#PLOT
+#Create 2 models, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
+allometry_pcscores_taxa_comb <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size + pcscores_taxa_size$taxon,
+                                               print.progress = FALSE, iter = 999)
 
-##Pairwise comparison of regression models between groups and taxa - each category separately ----
+allometry_pcscores_taxa_int <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size * pcscores_taxa_size$taxon,
+                                              print.progress = FALSE, iter = 999)
+
+#Check results
+summary(allometry_pcscores_taxa_comb)
+summary(allometry_pcscores_taxa_int)
+
+#Save results to file
+sink("bulla_R/allometry_taxa.txt")
+print("No group")
+summary(allometry_pcscores_taxa)
+
+print("Comb")
+summary(allometry_pcscores_taxa_comb)
+
+print("Int")
+summary(allometry_pcscores_taxa_int)
+sink() 
+
+#Anova for difference between models - should find the comb and int to be significantly better than null and they ca be used in pairwise comparisons
+anova(allometry_pcscores_taxa,allometry_pcscores_taxa_comb,allometry_pcscores_taxa_int)
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_pcscores_taxa <- pairwise(allometry_pcscores_taxa_int, fit.null = allometry_pcscores_taxa_comb,
+                                                   groups = pcscores_taxa_size$taxon, 
+                                                   covariate =  pcscores_taxa_size$size, print.progress = FALSE) 
+pairwise_allometry_pcscores_taxa
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups, if significant means int model better than comb
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "dist") 
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "DL") 
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "var")
+
+#Univariate p-values - different ways to calculate p-value and z scores for each comparison, shdoul match first summary
+slope_diffs <- sapply(pairwise_allometry_pcscores_taxa$slopes, function(x) as.vector(dist(x)))
+rownames(slope_diffs) <- rownames(summary(pairwise_allometry_pcscores_taxa)$summary.table) #only use if many comparisons
+apply(slope_diffs, 1, RRPP:::pval) # P-values
+apply(slope_diffs, 1, RRPP:::effect.size) # Z-scores
+
+#Save results to file
+sink("bulla_R/pairwise_allometry_pcscores_taxa.txt")
+print("ANOVA models")
+anova(allometry_pcscores_taxa,allometry_pcscores_taxa_comb,allometry_pcscores_taxa_int)
+
+print("1-Pairwise distances slopes")
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "dist") 
+
+print("2-Distance between angles")
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+print("3-Difference in slope vector lenght (differecne in rate of change od shape per unit of size)")
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "DL") 
+
+print("4-Difference in sipserion around mean slope")
+summary(pairwise_allometry_pcscores_taxa, confidence = 0.95, test.type = "var") 
+
+print("5-Univariate p-values and z-scores -  should match 1-Pairwise distances slopes")
+apply(slope_diffs, 1, RRPP:::pval) # P-values
+apply(slope_diffs, 1, RRPP:::effect.size) # Z-scores
+sink()
+
+#Plot to obtain regression score of pc scores vs bulla length or periotic length, use best model - regression method with "RegScore" plotting
+allometry_pcscores_taxa_plot <- plot(allometry_pcscores_taxa_int, type = "regression",predictor = pcscores_taxa_size$size, 
+                                           reg.type = "RegScore", xlab = "Ln(bulla length)", 
+                                           pch = 21, col = "chartreuse4", bg = "chartreuse4", cex = 1.2, font.main = 2)   #improve graphics
+
+
+##Make better allometry plot with ggplot
+#Create data frame object that ggplot can read - use data from plot object you want to improve
+allometry_pcscores_taxa_tibble <- data.frame(size = allometry_pcscores_taxa_plot[["plot.args"]][["x"]], 
+                                                   RegScores = allometry_pcscores_taxa_plot[["plot.args"]][["y"]])
+
+#Convert data frame to tibble
+allometry_pcscores_taxa_tibble<- as_tibble(allometry_pcscores_taxa_tibble)
+#Add labels and other attributes to tibble as columns
+allometry_pcscores_taxa_tibble <- allometry_pcscores_taxa_tibble %>% mutate(specimens = gdf_taxa$code, taxon = gdf_taxa$taxon, 
+                                                                            group = gdf_taxa$group, category = gdf_taxa$category)
+glimpse(allometry_pcscores_taxa_tibble)
+
+
+#Nice plot with specimens colored by group AND regression lines for each group
+allometry_pcscores_taxa_ggplot <- ggplot(allometry_pcscores_taxa_tibble, aes(x = size, y = RegScores, colour = taxon, shape = group))+
+  geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
+              alpha = 0.2, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
+  geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
+  scale_color_manual(values = mypalette_taxa, #select colors from palette from taxa
+                     aesthetics = c("color","fill"))+          
+  scale_shape_manual(values = shapes)+
+  theme_classic(base_size = 12)+
+  xlab("Log(Bulla length)")+
+  ylab("Regression Score")+
+  ggtitle ("Allometry by taxon - p-value = 0.001**")+  #copy from model summary
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.position = "none", legend.direction = "horizontal")
+#Add silhouettes groups
+allometry_pcscores_taxa_ggplot <- allometry_pcscores_taxa_ggplot   + 
+  add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -11, ysize = 2.3, color = mypalette_taxa[1])+
+  add_phylopic(B.physalus, alpha = 1, x = 3.6, y = 10, ysize = 2.3, color = mypalette_taxa[2])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 2.5, y = -7, ysize = 2.8, color = mypalette_taxa[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.3, y = 4, ysize = 2.4, color = mypalette_taxa[4])
+#Visualize plot and save as PDF using menu in bar on the right
+allometry_pcscores_taxa_ggplot
+
+##Pairwise comparison of regression models between groups - each category separately ----
 #Repeat same analyses but using pc scores for each category
+#Uneven mysticetes sampling, only group analyses possible for each category
 
+#Create objects for each category - born is not used since not enough postnatal Mysticeti in dataset
 pcscores_taxa_size_early <- pcscores_taxa_size %>% filter(category %in% "early")
 
 pcscores_taxa_size_late <- pcscores_taxa_size %>% filter(category %in% "late")
 
-pcscores_taxa_size_born <- pcscores_taxa_size %>% filter(category %in% "born")
+##Early
+#Create 3 models, null model, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
+allometry_pcscores_taxa_early <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size,
+                                          print.progress = FALSE, iter = 999)
 
-#FIXME
-#Copy from above
-#Null model, comb, int
-#ANOVA
-#PAIRWISE
-#no plots needed
+allometry_pcscores_taxa_early_group_comb <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size + pcscores_taxa_size_early$group,
+                                         print.progress = FALSE, iter = 999)
+
+allometry_pcscores_taxa_early_group_int <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size * pcscores_taxa_size_early$group,
+                                        print.progress = FALSE, iter = 999)
+
+#Check results
+summary(allometry_pcscores_taxa_early)
+summary(allometry_pcscores_taxa_early_group_comb)
+summary(allometry_pcscores_taxa_early_group_int)
+
+#Save results to file
+sink("bulla_R/allometry_taxa_early_group.txt")
+print("No group")
+summary(allometry_pcscores_taxa_early)
+
+print("Comb")
+summary(allometry_pcscores_taxa_early_group_comb)
+
+print("Int")
+summary(allometry_pcscores_taxa_early_group_int)
+sink() 
+
+#Anova for difference between models - should find the comb and int to be significantly better than null and they ca be used in pairwise comparisons
+anova(allometry_pcscores_taxa_early,allometry_pcscores_taxa_early_group_comb,allometry_pcscores_taxa_early_group_int)
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_pcscores_taxa_early_group <- pairwise(allometry_pcscores_taxa_early_group_int, fit.null = allometry_pcscores_taxa_early_group_comb,
+                                             groups = pcscores_taxa_size_early$group, 
+                                             covariate =  pcscores_taxa_size_early$size, print.progress = FALSE) 
+pairwise_allometry_pcscores_taxa_early_group
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups, if significant means int model better than comb
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "dist") 
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "DL") 
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "var")
+
+#Univariate p-values - different ways to calculate p-value and z scores for each comparison, shdoul match first summary
+slope_diff_early_groups <- sapply(pairwise_allometry_pcscores_taxa_early_group$slopes, function(x) as.vector(dist(x)))
+slope_diff_early_groups <- matrix(slope_diff_early_groups, nrow = 1, ncol = 1000)
+slope_diff_early_groups <- provideDimnames(slope_diff_early_groups) 
+dimnames(slope_diff_early_groups) <- list("Mysticeti:Odontoceti")
+apply(slope_diff_early_groups, 1, RRPP:::pval) # P-values
+apply(slope_diff_early_groups, 1, RRPP:::effect.size) # Z-scores
+
+#Save results to file
+sink("bulla_R/pairwise_allometry_pcscores_taxa_early_group.txt")
+print("ANOVA models")
+anova(allometry_pcscores_taxa_early,allometry_pcscores_taxa_early_group_comb,allometry_pcscores_taxa_early_group_int)
+
+print("1-Pairwise distances slopes")
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "dist") 
+
+print("2-Distance between angles")
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+print("3-Difference in slope vector lenght (differecne in rate of change od shape per unit of size)")
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "DL") 
+
+print("4-Difference in sipserion around mean slope")
+summary(pairwise_allometry_pcscores_taxa_early_group, confidence = 0.95, test.type = "var") 
+
+print("5-Univariate p-values and z-scores -  should match 1-Pairwise distances slopes")
+apply(slope_diff_early_groups, 1, RRPP:::pval) # P-values
+apply(slope_diff_early_groups, 1, RRPP:::effect.size) # Z-scores
+sink()
+
+##Late
+#Create 3 models, null model, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
+allometry_pcscores_taxa_late <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size,
+                                          print.progress = FALSE, iter = 999)
+
+allometry_pcscores_taxa_late_group_comb <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size + pcscores_taxa_size_late$group,
+                                                     print.progress = FALSE, iter = 999)
+
+allometry_pcscores_taxa_late_group_int <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size * pcscores_taxa_size_late$group,
+                                                    print.progress = FALSE, iter = 999)
+
+#Check results
+summary(allometry_pcscores_taxa_late)
+summary(allometry_pcscores_taxa_late_group_comb)
+summary(allometry_pcscores_taxa_late_group_int)
+
+#Save results to file
+sink("bulla_R/allometry_taxa_late_group.txt")
+print("No group")
+summary(allometry_pcscores_taxa_late)
+
+print("Comb")
+summary(allometry_pcscores_taxa_late_group_comb)
+
+print("Int")
+summary(allometry_pcscores_taxa_late_group_int)
+sink() 
+
+#Anova for difference between models - should find the comb and int to be significantly better than null and they ca be used in pairwise comparisons
+anova(allometry_pcscores_taxa_late,allometry_pcscores_taxa_late_group_comb,allometry_pcscores_taxa_late_group_int)
+
+#Pairwise comparison for the combination and interaction model
+#Helps determine if there is a significant difference in slope (int model) in the allometry trajectory on top of difference in intercept (comb model)
+pairwise_allometry_pcscores_taxa_late_group <- pairwise(allometry_pcscores_taxa_late_group_int, fit.null = allometry_pcscores_taxa_late_group_comb,
+                                                         groups = pcscores_taxa_size_late$group, 
+                                                         covariate =  pcscores_taxa_size_late$size, print.progress = FALSE) 
+pairwise_allometry_pcscores_taxa_late_group
+
+#Distances between slope vectors (end-points) - absolute difference between slopes of groups, if significant means int model better than comb
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "dist") 
+
+#Correlation between slope vectors (and angles) - similarity of vector orientation or angle,
+#if significant means the vectors of the groups are oriented in different ways 
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+#Absolute difference between slope vector lengths - difference in rate of change per covariate unit (size),
+#if significant means there is a significant rate of change difference in shape between groups during growth
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "DL") 
+
+#Compare the dispersion around group slopes - fit of the data to the regression
+#if significant difference might be problem as it means the groups are not evenly sampled or one of them contains relevant outliers
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "var")
+
+#Univariate p-values - different ways to calculate p-value and z scores for each comparison, shdoul match first summary
+slope_diff_late_groups <- sapply(pairwise_allometry_pcscores_taxa_late_group$slopes, function(x) as.vector(dist(x)))
+slope_diff_late_groups <- matrix(slope_diff_late_groups, nrow = 1, ncol = 1000)
+slope_diff_late_groups <- provideDimnames(slope_diff_late_groups) 
+dimnames(slope_diff_late_groups) <- list("Mysticeti:Odontoceti")
+apply(slope_diff_late_groups, 1, RRPP:::pval) # P-values
+apply(slope_diff_late_groups, 1, RRPP:::effect.size) # Z-scores
+
+#Save results to file
+sink("bulla_R/pairwise_allometry_pcscores_taxa_late_group.txt")
+print("ANOVA models")
+anova(allometry_pcscores_taxa_late,allometry_pcscores_taxa_late_group_comb,allometry_pcscores_taxa_late_group_int)
+
+print("1-Pairwise distances slopes")
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "dist") 
+
+print("2-Distance between angles")
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "VC",
+        angle.type = "deg") 
+
+print("3-Difference in slope vector lenght (differecne in rate of change od shape per unit of size)")
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "DL") 
+
+print("4-Difference in sipserion around mean slope")
+summary(pairwise_allometry_pcscores_taxa_late_group, confidence = 0.95, test.type = "var") 
+
+print("5-Univariate p-values and z-scores -  should match 1-Pairwise distances slopes")
+apply(slope_diff_late_groups, 1, RRPP:::pval) # P-values
+apply(slope_diff_late_groups, 1, RRPP:::effect.size) # Z-scores
+sink()
+
 
