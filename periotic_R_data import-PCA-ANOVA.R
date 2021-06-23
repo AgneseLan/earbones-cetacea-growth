@@ -58,7 +58,7 @@ glimpse(ordination_values)
 
 #Sink values to file in more readable format
 sink("periotic_R/ordination_values.txt", append = F)
-print(ordination_values )
+print(ordination_values)
 sink()
 
 ##Order classifiers by category, useful for plot legend
@@ -75,27 +75,23 @@ classifiers$code
 
 #Make factor for variable
 raw_dat$code <- factor(raw_dat$code, #check levels below from string printed with the code above
-                       levels = c("Be3" ,  "Bf1"  , "Ff1"  , "Ff3" ,  "Ff4" ,  "Ff5"  , "Ff6" ,  "Ff7" ,  "Gf1"  , "Hf3" ,  "Hf4"  , "Hf6"  ,
-                                  "Hf8",   "Hf9" ,  "Mf1",   "Sf1"  , "Sf2"  , "Wf1" ,  "Delf1",
-                                  "Delf2" ,"Delf3", "Gloe1" ,"Glof1", "Glof2" ,"Kogf1" ,"Kogf2" ,"Lagf1", "Lagf2", "Monf1", "Monf2", "Phof1" ,
-                                  "Phof3" ,"Phof4", "Phof5", "Phof6", "Phye1" ,"Phye2", "Phye3",
-                                  "Phyf2", "Psef1", "Staf2", "Staf3", "Staf4", "Staf5", "Ttrf1" ,"Af3" ,  "Af4" ,  "Af5" ,  "Af6" , "Af7" ,  
-                                  "Af8"  , "Mf2",   "Ddef1" ,"Ddef2", "Glof3" ,"Glof4" ,"Lagf3",
-                                  "Neof1", "Phof7", "Phof8" ,"Phof9", "Staf1", "Staf6" ,"Ttrf2" ,"Gn1" ,  "Mn1" ,  "Pn1",   "Laga1" ,"Phoa1", 
-                                  "Phoa2" ,"Phoa3", "Staj1", "Stan1" ,"Stln1", "Stln2")) 
+                       levels = c("Bf1" ,  "Ff6"  , "Ff7" ,  "Hf8"  , "Hf9"  , "Sf2" ,  "Wf1",   "Kogf2" ,
+                                  "Lagf1" ,"Lagf2", "Monf1", "Phof1", "Phof5", "Phof6", "Staf4" ,"Staf5", "Af3",
+                                  "Af4" ,  "Af5"  , "Af6" ,  "Af7"  , "Af8"  , "Mf2" ,  "Ddef1", "Ddef2",
+                                  "Glof3" ,"Glof4", "Lagf3" ,"Neof1", "Phof7" ,"Phof8", "Phof9", "Staf1", "Staf6",
+                                  "Ttrf2" ,"Gn1" ,  "Mn1"  , "Pn1" ,  "Laga1", "Phoa1", "Phoa2" ,"Phoa3", 
+                                  "Staj1" ,"Stan1" ,"Stln1" ,"Stln2")) 
 #Order
 raw_dat <- raw_dat[order(raw_dat$code),]
 
 #Order ordination scores to match classifiers - same list as above
 ordination_scores$code <- factor(ordination_scores$code, #check levels below from string printed with the code above
-                                 levels = c("Be3" ,  "Bf1"  , "Ff1"  , "Ff3" ,  "Ff4" ,  "Ff5"  , "Ff6" ,  "Ff7" ,  "Gf1"  , "Hf3" ,  "Hf4"  , "Hf6"  ,
-                                            "Hf8",   "Hf9" ,  "Mf1",   "Sf1"  , "Sf2"  , "Wf1" ,  "Delf1",
-                                            "Delf2" ,"Delf3", "Gloe1" ,"Glof1", "Glof2" ,"Kogf1" ,"Kogf2" ,"Lagf1", "Lagf2", "Monf1", "Monf2", "Phof1" ,
-                                            "Phof3" ,"Phof4", "Phof5", "Phof6", "Phye1" ,"Phye2", "Phye3",
-                                            "Phyf2", "Psef1", "Staf2", "Staf3", "Staf4", "Staf5", "Ttrf1" ,"Af3" ,  "Af4" ,  "Af5" ,  "Af6" , "Af7" ,  
-                                            "Af8"  , "Mf2",   "Ddef1" ,"Ddef2", "Glof3" ,"Glof4" ,"Lagf3",
-                                            "Neof1", "Phof7", "Phof8" ,"Phof9", "Staf1", "Staf6" ,"Ttrf2" ,"Gn1" ,  "Mn1" ,  "Pn1",   "Laga1" ,"Phoa1", 
-                                            "Phoa2" ,"Phoa3", "Staj1", "Stan1" ,"Stln1", "Stln2")) 
+                                 levels = c("Bf1" ,  "Ff6"  , "Ff7" ,  "Hf8"  , "Hf9"  , "Sf2" ,  "Wf1",   "Kogf2" ,
+                                            "Lagf1" ,"Lagf2", "Monf1", "Phof1", "Phof5", "Phof6", "Staf4" ,"Staf5", "Af3",
+                                            "Af4" ,  "Af5"  , "Af6" ,  "Af7"  , "Af8"  , "Mf2" ,  "Ddef1", "Ddef2",
+                                            "Glof3" ,"Glof4", "Lagf3" ,"Neof1", "Phof7" ,"Phof8", "Phof9", "Staf1", "Staf6",
+                                            "Ttrf2" ,"Gn1" ,  "Mn1"  , "Pn1" ,  "Laga1", "Phoa1", "Phoa2" ,"Phoa3", 
+                                            "Staj1" ,"Stan1" ,"Stln1" ,"Stln2"))  
 #Order
 ordination_scores <- ordination_scores[order(ordination_scores$code),]
 
@@ -123,18 +119,20 @@ groups <- classifiers$group
 taxa <- classifiers$taxon
 
 ##Make natural log relevant columns
-classifiers <- classifiers %>% mutate(BZW_log = log(BZW), perioticL_log  = log(perioticL), perioticW_log  = log(perioticW), 
+classifiers <- classifiers %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bullaL), bullaW_log  = log(bullaW), 
                                       perioticL_log = log(perioticL), perioticW_log = log(perioticW))
 
 ##Create object with classifiers only for the best sampled taxa - useful later in analyses
 #Create vector with the names of the best sampled taxa
-#B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#B.bonaerensis/acutorostata (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 best_taxa <- c("B.acutorostrata", "B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata")
 
 #Create new classifiers object
 classifiers_taxa <- classifiers %>% filter(taxon %in% best_taxa)
 #Replace to have only 1 taxon name for minkes
 classifiers_taxa[classifiers_taxa == "B.acutorostrata"] <- "B.bonaerensis"
+#Replace B.physalus with B.boanerensis - same genus, no B.bonaerensis for early fetus and needed for analysis of trajectory to have it
+classifiers_taxa[classifiers_taxa == "B.physalus"] <- "B.bonaerensis"
 
 ##Save objects for later analysis
 #Save growth categories as factor, useful for later analysis
@@ -146,10 +144,9 @@ groups_taxa <- classifiers_taxa$group
 #Save taxa as factor, useful for later analysis
 taxa_taxa <- classifiers_taxa$taxon
 
-
 #Transform in 3D array, first number is number of landmarks, second is dimensions (3)
 #To find the number of landmark points, divide the number of variables in raw_dat - visible in Environment - by 3
-shape_array <- arrayspecs(raw_dat, 24953 , #number in raw_dat divided by 3
+shape_array <- arrayspecs(raw_dat, 24894 , #number in raw_dat divided by 3
                           3) #number of dimensions
 
 #Calculate mean shape coordinates
@@ -159,7 +156,7 @@ mean_shape <- mshape(shape_array)
 gdf <- geomorph.data.frame(coords = shape_array, 
                            code = classifiers$code, group = classifiers$group, 
                            category = classifiers$category, taxon = classifiers$taxon, BZW_log = classifiers$BZW_log,
-                           periotic_log = classifiers$perioticL_log, periotic_log = classifiers$perioticL_log)
+                           bulla_log = classifiers$bullaL_log, periotic_log = classifiers$perioticL_log)
 glimpse(gdf)
 
 #Check for specimens that are outliers - if they are very young specimens it is expected
@@ -175,7 +172,7 @@ best_taxa_rows <- c(
   which(classifiers[,4] == "Ph.phocoena"),
   which(classifiers[,4] == "St.attenuata"))
 #Display list of row numbers that do not contain these taxa in order
-omit <- as.vector(setdiff(1:75, best_taxa_rows)) 
+omit <- as.vector(setdiff(1:46, best_taxa_rows)) #1 to max number of observations from raw_dat
 
 #Make new shape array eliminating rows of other taxa from shape array
 shape_array_taxa <- shape_array[,,-omit]
@@ -185,8 +182,8 @@ mean_shape_taxa <- mshape(shape_array_taxa)
 
 #Make new gdf with classifiers for these taxa only
 gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_taxa$code, group = classifiers_taxa$group, 
-                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon,
-                                periotic_log = classifiers_taxa$perioticL_log, periotic_log = classifiers_taxa$perioticL_log)
+                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon, BZW_log = classifiers_taxa$BZW_log,
+                                bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
 glimpse(gdf_taxa)
 
 
@@ -224,11 +221,11 @@ mypalette_category_image <- image(1:3, 1, as.matrix(1:3), col = mypalette_catego
 #Create shape palette for groups
 shapes <- c(15,19) #these are a square and a circle, use ?pch to see more shapes
 #Create shape palette for best taxa
-shapes_taxa <- c(15,18,19,17) #these are a square and a circle, use ?pch to see more shapes
+shapes_taxa <- c(15,19,17) #these are a square and a circle, use ?pch to see more shapes
 
 ##Images for plots
 B.bonaerensis <- readPNG("Data/b.bona.png")
-B.physalus <- readPNG("Data/b.physalus.png")
+B.physalus <- readPNG("Data/b.physalus.png") #use for Mysticeti data only
 Ph.phocoena <- readPNG("Data/phocoena.png")
 St.attenuata <- readPNG("Data/stenella.png")
 
@@ -273,7 +270,7 @@ PCA_all_plot <- plot(PCA_all, main = "PCA all data",  pch = 21, #title and type 
 text(x = PCA_all$x[,1], y = PCA_all$x[,2], labels = rownames(PCA_all$x), 
      pos = 1,       #position relative to data point
      offset = 0.5,  #distance from data point
-     cex = 0.75)    #font size (1=regular)
+     cex = 0.45)    #font size (1=regular)
 
 #Save PC scores as object to use later
 pcscores_all <- PCA_all$x 
@@ -293,8 +290,8 @@ PCA_all_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specime
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA all data")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -318,8 +315,8 @@ PCA_all_hulls_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = s
                     values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA all data")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
@@ -345,8 +342,8 @@ PCA_all_earlyfetus_ggplot <- ggplot(pcscores_all_earlyfetus, aes(x = Comp1, y = 
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA early fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -359,8 +356,8 @@ PCA_all_latefetus_ggplot <- ggplot(pcscores_all_latefetus, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA late fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -373,8 +370,8 @@ PCA_all_postnatal_ggplot <- ggplot(pcscores_all_postnatal, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA postnatal")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -388,18 +385,20 @@ PCA_all_postnatal_ggplot
 pcscores_taxa <- pcscores_all %>% filter(taxon %in% best_taxa)
 #Replace to have only 1 taxon name for minkes
 pcscores_taxa[pcscores_taxa == "B.acutorostrata"] <- "B.bonaerensis"
+#Replace B.physalus with B.boanerensis - same genus, no B.bonaerensis for early fetus and needed for analysis of trajectory to have it
+pcscores_taxa[pcscores_taxa == "B.physalus"] <- "B.bonaerensis"
 
 #Nice PCA plot with only  well sampled taxa
 PCA_taxa_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, shape = group, colour = taxon, alpha = category, label = specimens))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -416,16 +415,16 @@ glimpse(hulls_taxa)
 #Nice PCA plot with hulls around categories
 PCA_taxa_hulls_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, colour = taxon, alpha = category))+
   geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   geom_polygon(data = hulls_taxa, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (15.79%)")+ #copy this from standard PCA plot (PCA_all_plot)
-  ylab("PC 2 (7.14%)")+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
   ggtitle("PCA selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
@@ -452,6 +451,23 @@ summary(reg_PC1all_size)
 
 print("PC2")
 summary(reg_PC2all_size)
+sink() 
+
+#Check if main components may be associated with group (Mysticeti/Odontoceti)
+reg_PC1all_group <- lm(Comp1 ~ group, data = pcscores_all_size)
+reg_PC2all_group <- lm(Comp2 ~ group, data = pcscores_all_size)
+
+#View results and p-value
+summary(reg_PC1all_group)
+summary(reg_PC2all_group)
+
+#Save results of significant regression to file
+sink("periotic_R/PC1-PC2_group_lm.txt")
+print("PC1")
+summary(reg_PC1all_group)
+
+print("PC2")
+summary(reg_PC2all_group)
 sink() 
 
 #CH. 4 - ALLOMETRY ----
@@ -485,7 +501,8 @@ allometry_plot_regscore <- plot(allometry, type = "regression",predictor = gdf$p
 
 ##Make better allometry plot with ggplot
 #Create data frame object that ggplot can read - use data from plot object you want to improve
-allometry_plot <- data.frame(size = allometry_plot_regscore[["plot.args"]][["x"]], RegScores = allometry_plot_regscore[["plot.args"]][["y"]])
+allometry_plot <- data.frame(size = allometry_plot_regscore[["plot.args"]][["x"]], 
+                             RegScores = allometry_plot_regscore[["plot.args"]][["y"]])
 
 #Convert data frame to tibble
 allometry_plot <- as_tibble(allometry_plot)
@@ -502,9 +519,9 @@ allometry_ggplot <- ggplot(allometry_plot, aes(x = size, y = RegScores, colour =
                       values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
-  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  ggtitle ("Allometry plot - p-value = 0.002**")+  #copy from model summary
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
@@ -549,9 +566,9 @@ allometry_taxa_ggplot <- ggplot(allometry_plot_taxa, aes(x = size, y = RegScores
                       values = mypalette_category)+            #legend and color adjustments          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
-  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  ggtitle ("Allometry plot - p-value = 0.016*")+  #copy from model summary
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
@@ -562,13 +579,13 @@ allometry_taxa_ggplot_taxon <- ggplot(allometry_plot_taxa, aes(x = size, y = Reg
   geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
               alpha = 0.3, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
-  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa), #select colors from palette from taxa
+  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa[1], mypalette_taxa[3:4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
-  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  ggtitle ("Allometry plot - p-value = 0.016*")+  #copy from model summary
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
@@ -576,23 +593,22 @@ allometry_taxa_ggplot_taxon
 
 #Nice plot with specimens colored by taxon AND regression lines for each taxon with confidence intervals no legend but phylopic
 allometry_taxa_ggplot_taxon_nolegend <- ggplot(allometry_plot_taxa, aes(x = size, y = RegScores, colour = taxon, shape = group))+
-  geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
+  geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,    
               alpha = 0.3, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
-  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa), #select colors from palette from taxa
+  scale_color_manual(name = "Taxa", labels  = c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), values = c(mypalette_taxa[1], mypalette_taxa[3:4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+          
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
-  ggtitle ("Allometry plot - p-value = 0.001**")+  #copy from model summary
+  ggtitle ("Allometry plot - p-value = 0.016*")+  #copy from model summary
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "none")
 #Add silhouettes taxa
 allometry_taxa_ggplot_taxon_nolegend <- allometry_taxa_ggplot_taxon_nolegend  + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 3.9, y = -4, ysize = 2.6, color = mypalette_taxa[1])+
-  add_phylopic(B.physalus, alpha = 1, x = 3.3, y = 9.5, ysize = 2.6, color = mypalette_taxa[2])+
-  add_phylopic(Ph.phocoena, alpha = 1, x = 2.2, y = 0, ysize = 3.2, color = mypalette_taxa[3])+
-  add_phylopic(St.attenuata, alpha = 1, x = 2.3, y = -15, ysize = 2.7, color = mypalette_taxa[4])
+  add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -5, ysize = 2.6, color = mypalette_taxa[1])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 2.55, y = -10, ysize = 3, color = mypalette_taxa[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.65, y = 1, ysize = 2.5, color = mypalette_taxa[4])
 
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_taxa_ggplot_taxon_nolegend
@@ -618,8 +634,8 @@ ordination_scores_ggplot <- ggplot(ordination_scores, aes(x = axis1, y = axis2, 
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("I (15.79%)")+ #copy this from ordination values_100 column printed before
-  ylab("II (7.14%)")+
+  xlab("I (14.24%)")+ #copy this from ordination values_100 column printed before
+  ylab("II (9.49%)")+
   ggtitle("PCOORD GPSA")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 12))  #title font and position
 
@@ -632,18 +648,20 @@ ordination_scores_ggplot
 ordination_scores_taxa <- ordination_scores %>% filter(taxon %in% best_taxa)
 #Replace to have only 1 taxon name for minkes
 ordination_scores_taxa[ordination_scores_taxa == "B.acutorostrata"] <- "B.bonaerensis"
+#Replace B.physalus with B.boanerensis - same genus, no B.bonaerensis for early fetus and needed for analysis of trajectory to have it
+ordination_scores_taxa[ordination_scores_taxa == "B.physalus"] <- "B.bonaerensis"
 
 #Nice PCA plot with only  well sampled taxa
 ordination_scores_taxa_ggplot <- ggplot(ordination_scores_taxa, aes(x = axis1, y = axis2, shape = group, colour = taxon, alpha = category, label = specimens))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   theme_bw()+
-  xlab("I (15.79%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
-  ylab("II (7.14%)")+
+  xlab("I (14.24%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
+  ylab("II (9.49%)")+
   ggtitle("PCOORD GPSA selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -660,16 +678,16 @@ glimpse(hulls_ordination_scores_taxa)
 #Nice PCA plot with hulls around categories
 ordination_scores_taxa_hulls_ggplot <- ggplot(ordination_scores_taxa, aes(x = axis1, y = axis2, colour = taxon, alpha = category))+
   geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   geom_polygon(data = hulls_ordination_scores_taxa, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("I (15.79%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
-  ylab("II (7.14%)")+
+  xlab("I (14.24%)")+ #copy this from other ordination_scores plot (ordination_scores_ggplot)
+  ylab("II (9.49%)")+
   ggtitle("PCOORD GPSA selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
@@ -698,6 +716,23 @@ print("II")
 summary(reg_axis2_size)
 sink() 
 
+#Check if main components may be associated with group (Mysticeti/Odontoceti)
+reg_axis1_group <- lm(axis1 ~ group, data = ordination_scores_size)
+reg_axis2_group <- lm(axis2 ~ group, data = ordination_scores_size)
+
+#View results and p-value
+summary(reg_axis1_group)
+summary(reg_axis2_group)
+
+#Save results of significant regression to file
+sink("periotic_R/axis1-axis2_group_lm.txt")
+print("I")
+summary(reg_PC1all_group)
+
+print("II")
+summary(reg_PC2all_group)
+sink() 
+
 #CH. 6 - ANOVA OF SHAPE (pc scores) AND SIZE FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis  ----
 #Conduct ANOVA to test if there is significant difference in allometry between groups (Mysticeti, Odontoceti) or between each taxon
 #Also check if difference varies at different growth categories
@@ -707,7 +742,7 @@ sink()
 pcscores_taxa_size <- pcscores_taxa %>% mutate(size = gdf_taxa$periotic_log)
 
 #Create basic model first with no interactions for comparison
-allometry_pcscores_taxa <- procD.lm(pcscores_taxa_size[1:75] #number of PC components (1 per column)
+allometry_pcscores_taxa <- procD.lm(pcscores_taxa_size[1:45] #number of PC components (1 per column)
                                     ~ pcscores_taxa_size$size, print.progress = FALSE, iter = 999)
 
 #Check results
@@ -715,10 +750,10 @@ summary(allometry_pcscores_taxa)
 
 ##Pairwise comparison of regression models between groups - all categories ----
 #Create 2 models, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
-allometry_pcscores_taxa_group_comb <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size + pcscores_taxa_size$group,
+allometry_pcscores_taxa_group_comb <- procD.lm(pcscores_taxa_size[1:45] ~ pcscores_taxa_size$size + pcscores_taxa_size$group,
                                                print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_group_int <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size * pcscores_taxa_size$group,
+allometry_pcscores_taxa_group_int <- procD.lm(pcscores_taxa_size[1:45] ~ pcscores_taxa_size$size * pcscores_taxa_size$group,
                                               print.progress = FALSE, iter = 999)
 
 #Check results
@@ -821,9 +856,9 @@ allometry_pcscores_taxa_group_ggplot <- ggplot(allometry_pcscores_taxa_group_tib
   geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
   scale_color_manual(values = c(mypalette_taxa[2],mypalette_taxa[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+          
-  scale_shape_manual(name = "Taxa", labels = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = shapes_taxa)+
+  scale_shape_manual(name = "Taxa", labels = c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), values = shapes_taxa)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
   ggtitle ("Allometry by group - p-value = 0.001**")+  #copy from model summary
   guides(colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))+
@@ -831,8 +866,8 @@ allometry_pcscores_taxa_group_ggplot <- ggplot(allometry_pcscores_taxa_group_tib
         legend.position = "bottom", legend.direction = "horizontal")
 #Add silhouettes groups
 allometry_pcscores_taxa_group_ggplot <- allometry_pcscores_taxa_group_ggplot   + 
-  add_phylopic(B.physalus, alpha = 1, x = 3.8, y = -10, ysize = 2.8, color = mypalette_taxa[2])+
-  add_phylopic(St.attenuata, alpha = 1, x = 3, y = 7, ysize = 2.5, color = mypalette_taxa[4])
+  add_phylopic(B.physalus, alpha = 1, x = 3.9, y = -8, ysize = 3.5, color = mypalette_taxa[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.8, y = 5, ysize = 3.2, color = mypalette_taxa[4])
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_pcscores_taxa_group_ggplot
 
@@ -840,10 +875,10 @@ allometry_pcscores_taxa_group_ggplot
 ##Test if there is a significant difference between allometry general model and allometry considering taxa separately
 
 #Create 2 models, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
-allometry_pcscores_taxa_comb <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size + pcscores_taxa_size$taxon,
+allometry_pcscores_taxa_comb <- procD.lm(pcscores_taxa_size[1:45] ~ pcscores_taxa_size$size + pcscores_taxa_size$taxon,
                                          print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_int <- procD.lm(pcscores_taxa_size[1:75] ~ pcscores_taxa_size$size * pcscores_taxa_size$taxon,
+allometry_pcscores_taxa_int <- procD.lm(pcscores_taxa_size[1:45] ~ pcscores_taxa_size$size * pcscores_taxa_size$taxon,
                                         print.progress = FALSE, iter = 999)
 
 #Check results
@@ -941,21 +976,20 @@ allometry_pcscores_taxa_ggplot <- ggplot(allometry_pcscores_taxa_tibble, aes(x =
   geom_smooth(aes(x = size, y = RegScores, colour =  taxon, fill = taxon, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
               alpha = 0.2, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
-  scale_color_manual(values = mypalette_taxa, #select colors from palette from taxa
+  scale_color_manual(values = c(mypalette_taxa[1], mypalette_taxa[3:4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+          
   scale_shape_manual(values = shapes)+
   theme_classic(base_size = 12)+
-  xlab("Log(periotic length)")+
+  xlab("Log(Periotic length)")+
   ylab("Regression Score")+
-  ggtitle ("Allometry by taxon - p-value = 0.001**")+  #copy from model summary
+  ggtitle ("Allometry by taxon - p-value = 0.004**")+  #copy from model summary
   theme(plot.title = element_text(face = "bold", hjust = 0.5), 
         legend.position = "none", legend.direction = "horizontal")
 #Add silhouettes groups
 allometry_pcscores_taxa_ggplot <- allometry_pcscores_taxa_ggplot   + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -11, ysize = 2.3, color = mypalette_taxa[1])+
-  add_phylopic(B.physalus, alpha = 1, x = 3.6, y = 10, ysize = 2.3, color = mypalette_taxa[2])+
-  add_phylopic(Ph.phocoena, alpha = 1, x = 2.5, y = -7, ysize = 2.8, color = mypalette_taxa[3])+
-  add_phylopic(St.attenuata, alpha = 1, x = 2.3, y = 4, ysize = 2.4, color = mypalette_taxa[4])
+  add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -10, ysize = 3, color = mypalette_taxa[1])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 2.8, y = -6, ysize = 3.4, color = mypalette_taxa[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.3, y = 4, ysize = 2.7, color = mypalette_taxa[4])
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_pcscores_taxa_ggplot
 
@@ -970,13 +1004,13 @@ pcscores_taxa_size_late <- pcscores_taxa_size %>% filter(category %in% "late")
 
 ##Early
 #Create 3 models, null model, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
-allometry_pcscores_taxa_early <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size,
+allometry_pcscores_taxa_early <- procD.lm(pcscores_taxa_size_early[1:45] ~ pcscores_taxa_size_early$size,
                                           print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_early_group_comb <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size + pcscores_taxa_size_early$group,
+allometry_pcscores_taxa_early_group_comb <- procD.lm(pcscores_taxa_size_early[1:45] ~ pcscores_taxa_size_early$size + pcscores_taxa_size_early$group,
                                                      print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_early_group_int <- procD.lm(pcscores_taxa_size_early[1:75] ~ pcscores_taxa_size_early$size * pcscores_taxa_size_early$group,
+allometry_pcscores_taxa_early_group_int <- procD.lm(pcscores_taxa_size_early[1:45] ~ pcscores_taxa_size_early$size * pcscores_taxa_size_early$group,
                                                     print.progress = FALSE, iter = 999)
 
 #Check results
@@ -1055,13 +1089,13 @@ sink()
 
 ##Late
 #Create 3 models, null model, 1 with only intercept varying (combination) and one with slope and intercept varying (interaction)
-allometry_pcscores_taxa_late <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size,
+allometry_pcscores_taxa_late <- procD.lm(pcscores_taxa_size_late[1:45] ~ pcscores_taxa_size_late$size,
                                          print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_late_group_comb <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size + pcscores_taxa_size_late$group,
+allometry_pcscores_taxa_late_group_comb <- procD.lm(pcscores_taxa_size_late[1:45] ~ pcscores_taxa_size_late$size + pcscores_taxa_size_late$group,
                                                     print.progress = FALSE, iter = 999)
 
-allometry_pcscores_taxa_late_group_int <- procD.lm(pcscores_taxa_size_late[1:75] ~ pcscores_taxa_size_late$size * pcscores_taxa_size_late$group,
+allometry_pcscores_taxa_late_group_int <- procD.lm(pcscores_taxa_size_late[1:45] ~ pcscores_taxa_size_late$size * pcscores_taxa_size_late$group,
                                                    print.progress = FALSE, iter = 999)
 
 #Check results

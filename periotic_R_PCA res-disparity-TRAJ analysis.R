@@ -54,8 +54,8 @@ PCA_res_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specime
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA residuals")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -79,8 +79,8 @@ PCA_res_hulls_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = s
                     values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA residuals")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
@@ -106,8 +106,8 @@ PCA_res_earlyfetus_ggplot <- ggplot(pcscores_res_earlyfetus, aes(x = Comp1, y = 
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA early fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -120,8 +120,8 @@ PCA_res_latefetus_ggplot <- ggplot(pcscores_res_latefetus, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA late fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -134,8 +134,8 @@ PCA_res_postnatal_ggplot <- ggplot(pcscores_res_postnatal, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA postnatal")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -149,18 +149,20 @@ PCA_res_postnatal_ggplot
 pcscores_taxa_res <- pcscores_res %>% filter(taxon %in% best_taxa)
 #Replace to have only 1 taxon name for minkes
 pcscores_taxa_res[pcscores_taxa_res == "B.acutorostrata"] <- "B.bonaerensis"
+#Replace B.physalus with B.boanerensis - same genus, no B.bonaerensis for early fetus and needed for analysis of trajectory to have it
+pcscores_taxa_res[pcscores_taxa_res == "B.physalus"] <- "B.bonaerensis"
 
 #Nice PCA plot with only  well sampled taxa
 PCA_taxa_res_ggplot <- ggplot(pcscores_taxa_res, aes(x = Comp1, y = Comp2, shape = group, colour = taxon, alpha = category, label = specimens))+
   geom_point(size = 3)+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA residuals selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -177,16 +179,16 @@ glimpse(hulls_taxa_res)
 #Nice PCA plot with hulls around categories
 PCA_taxa_res_hulls_ggplot <- ggplot(pcscores_taxa_res, aes(x = Comp1, y = Comp2, colour = taxon, alpha = category))+
   geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+            #legend and color adjustments
   scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
   geom_polygon(data = hulls_taxa_res, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
-                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = c(mypalette_taxa[1], mypalette_taxa[3:4]))+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (7.45%)")+
+  xlab("PC 1 (14.74%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (8.52%)")+
   ggtitle("PCA residuals selected taxa")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
@@ -199,7 +201,7 @@ PCA_taxa_res_hulls_ggplot
 #How different are each group shapes compared to other group shapes?
 
 #Disparity between categories, not considering groups or taxa
-category_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa, iter = 999)
+category_disparity <- morphol.disparity(pcscores_taxa[1:45] ~ 1, groups = ~ categories_taxa, iter = 999)
 
 #Results and significance
 summary(category_disparity)
@@ -210,7 +212,7 @@ print(summary(category_disparity))
 sink() 
 
 #Disparity between categories, considering groups
-category_group_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa*groups_taxa, iter = 999)
+category_group_disparity <- morphol.disparity(pcscores_taxa[1:45] ~ 1, groups = ~ categories_taxa*groups_taxa, iter = 999)
 
 #Results and significance
 summary(category_group_disparity)
@@ -221,7 +223,7 @@ print(summary(category_group_disparity))
 sink() 
 
 #Disparity between categories, considering taxa
-category_taxa_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa*taxa_taxa, iter = 999)
+category_taxa_disparity <- morphol.disparity(pcscores_taxa[1:45] ~ 1, groups = ~ categories_taxa*taxa_taxa, iter = 999)
 
 #Results and significance
 summary(category_taxa_disparity)
@@ -238,7 +240,7 @@ groups_taxa_early <- pcscores_taxa_size_early$group
 groups_taxa_late <- pcscores_taxa_size_late$group
 
 #Early fetus
-group_disparity_early <- morphol.disparity(pcscores_taxa_size_early[1:75] ~ 1, groups = ~ groups_taxa_early, iter = 999)
+group_disparity_early <- morphol.disparity(pcscores_taxa_size_early[1:45] ~ 1, groups = ~ groups_taxa_early, iter = 999)
 
 #Results and significance
 summary(group_disparity_early)
@@ -249,7 +251,7 @@ summary(group_disparity_early)
 sink() 
 
 #Late fetus
-group_disparity_late <- morphol.disparity(pcscores_taxa_size_late[1:75] ~ 1, groups = ~ groups_taxa_late, iter = 999)
+group_disparity_late <- morphol.disparity(pcscores_taxa_size_late[1:45] ~ 1, groups = ~ groups_taxa_late, iter = 999)
 
 #Results and significance
 summary(group_disparity_late)
@@ -300,7 +302,7 @@ add.trajectories(group_trajectory_plot,
                  traj.pch = c(21, 22), traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= -15, y = -10, legend = c("Mysticeti","Odontoceti"), pch =  c(21, 22), pt.bg = 1)
+legend(x= -15, y = 12, legend = c("Mysticeti","Odontoceti"), pch =  c(21, 22), pt.bg = 1)
 
 ##Make better PCA plot using ggplot
 #Read PC scores as tibble
@@ -348,16 +350,16 @@ group_trajectory_ggplot <- ggplot(group_trajectory_pcscores, aes(x = PC1, y = PC
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   scale_colour_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = c(mypalette_taxa[2], mypalette_taxa[4]))+
   theme_bw()+
-  xlab("PC 1 (60.24%)")+ #copy this from standard trajectory plot
-  ylab("PC 2 (14.8%)")+
+  xlab("PC 1 (44.32%)")+ #copy this from standard trajectory plot
+  ylab("PC 2 (24.62%)")+
   ggtitle("Trajectories of growth by group")+
   guides(shape = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)), 
          colour = guide_legend(label = F, title = NULL))+
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "horizontal")
 #Add silhouettes groups
 group_trajectory_ggplot <- group_trajectory_ggplot   + 
-  add_phylopic(B.physalus, alpha = 1, x = -5, y = -7, ysize = 1.8, color = mypalette_taxa[2])+
-  add_phylopic(St.attenuata, alpha = 1, x = 0, y = 2.5, ysize = 1.7, color = mypalette_taxa[4])
+  add_phylopic(B.physalus, alpha = 1, x = -8, y = 5, ysize = 1.6, color = mypalette_taxa[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 2.8, y = -2.5, ysize = 1.5, color = mypalette_taxa[4])
 #Visualize plot and save as PDF using menu in bar on the right
 group_trajectory_ggplot
 
