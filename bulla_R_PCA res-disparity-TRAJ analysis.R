@@ -17,6 +17,9 @@ library(ggthemes)
 library(ggpubr)
 library(ggplotify)
 library(Morpho)
+library(rphylopic)
+library(png)
+library(gridExtra)
 
 #CH. 7 - PCA ALLOMETRY RESIDUALS ----
 
@@ -43,83 +46,59 @@ pcscores_res <- as_tibble(pcscores_res)
 pcscores_res <- pcscores_res %>% mutate(specimens = gdf$code, taxon = gdf$taxon, group = gdf$group, category = gdf$category)
 glimpse(pcscores_res)
 
-#Nice PCA plot with stages and groups
-PCA_res_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, shape = group))+
+#Nice plot with labels and specimens colored by category
+PCA_res_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = category, shape = group))+
   geom_point(size = 3)+
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60)+
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
-  ggtitle("PCA res data")+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
+  ggtitle("PCA residuals")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_res_ggplot
 
-#Make hulls for PCA plot with hulls around growth stages
+#Make hulls for PCA plot with hulls around growth category
 hulls_res <- pcscores_res %>%
-  group_by(stage) %>%
+  group_by(category) %>%
   slice(chull(Comp1, Comp2)) %>%
   rename(x = Comp1, y = Comp2)
 glimpse(hulls_res)
 
-#Nice PCA plot with hulls around stages
-PCA_res_hulls_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, fill = stage))+
+#Nice PCA plot with hulls around categories
+PCA_res_hulls_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
   geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
                       values = mypalette_category)+            #legend and color adjustments
-  geom_polygon(data = hulls_res, aes(x = x, y = y, fill = stage), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Neonate", "Juvenile", "Adult"),
+  geom_polygon(data = hulls_res, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Growth category", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
                     values =  mypalette_category)+ #must match scale_colour_manual
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
-  ggtitle("PCA res data")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5)) +
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
+  ggtitle("PCA residuals")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_res_hulls_ggplot  
 
-#Make hulls for PCA plot with hulls around categories (3 stages: early fetus, late fetus, postnatal)
-hulls_res_category <- pcscores_res %>%
-  group_by(category) %>%
-  slice(chull(Comp1, Comp2)) %>%
-  rename(x = Comp1, y = Comp2)
-glimpse(hulls_res_category)
+##Plots for each category ----
+#PCA plots for each category
+#Create one tibble for each category
+#First split between categories
+pcscores_res_category <- pcscores_res %>% group_by(category) %>% group_split()
+#Check order
+View(pcscores_res_category)
 
-#Nice PCA plot with hulls around categories (3 stages: early fetus, late fetus, postnatal)
-PCA_res_category_ggplot <- ggplot(pcscores_res, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
-  geom_point(size = 3, aes(shape = group))+
-  scale_colour_manual(name = "Growth stage", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
-  geom_polygon(data = hulls_res_category, aes(x = x, y = y, fill = category), alpha = .5, show.legend = FALSE)+ #colored hulls with transparency
-  scale_fill_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
-                    values =  c(mypalette_category[1:2], mypalette_category[4]))+ #must match scale_colour_manual
-  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
-  theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
-  ggtitle("PCA res data")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5))+
-  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)
-
-#Visualize plot and save as PDF using menu in bar on the right
-PCA_res_category_ggplot
-
-##PCA plot for each stage
-#Create one tibble for each stage
-#First split between stages
-pcscores_res_stages <- pcscores_res %>% group_by(category) %>% group_split()
-
-#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for all 3 postnatal stages (neonate, juvenile, adult)
-pcscores_res_earlyfetus <- pcscores_res_stages[[1]]
-pcscores_res_latefetus <- pcscores_res_stages[[2]]
-pcscores_res_postnatal <- pcscores_res_stages[[3]]
+#Save as separate tibbles - 1 for early fetus, 1 for late fetus, 1 for postnatal
+pcscores_res_earlyfetus <- pcscores_res_category[[1]]
+pcscores_res_latefetus <- pcscores_res_category[[2]]
+pcscores_res_postnatal <- pcscores_res_category[[3]]
 
 #Nice PCA plot with groups early fetus
 PCA_res_earlyfetus_ggplot <- ggplot(pcscores_res_earlyfetus, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
@@ -127,8 +106,8 @@ PCA_res_earlyfetus_ggplot <- ggplot(pcscores_res_earlyfetus, aes(x = Comp1, y = 
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
   ggtitle("PCA early fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -141,8 +120,8 @@ PCA_res_latefetus_ggplot <- ggplot(pcscores_res_latefetus, aes(x = Comp1, y = Co
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
   ggtitle("PCA late fetus")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
@@ -150,90 +129,134 @@ PCA_res_latefetus_ggplot <- ggplot(pcscores_res_latefetus, aes(x = Comp1, y = Co
 PCA_res_latefetus_ggplot
 
 #Nice PCA plot with groups postnatal
-PCA_res_postnatal_ggplot <- ggplot(pcscores_res_postnatal, aes(x = Comp1, y = Comp2, label = specimens, colour = stage, shape = group))+
-  geom_point(size = 3)+
+PCA_res_postnatal_ggplot <- ggplot(pcscores_res_postnatal, aes(x = Comp1, y = Comp2, label = specimens, shape = group))+
+  geom_point(size = 3, color = mypalette_category[3])+
   geom_text_repel(colour = "black", size = 3.5, max.overlaps = 40)+
-  scale_colour_manual(name = "Growth stage", labels =  c("Neonate", "Juvenile", "Adult"), #to be ordered as they appear in tibble
-                      values = mypalette_category[3:5])+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
   theme_bw()+
-  xlab("PC 1 (16.7%)")+ #copy this from standard PCA plot (PCA_res_plot)
-  ylab("PC 2 (11.8%)")+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
   ggtitle("PCA postnatal")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_res_postnatal_ggplot
 
-#CH. 8 - MORPHOLOGICAL DISPARITY -----
+##Plots for well sampled taxa only ----
+##PCA plot including only the 4 well sampled taxa
 
+#Make 1 tibble to include only the selected taxa
+pcscores_taxa_res <- pcscores_res %>% filter(taxon %in% best_taxa)
+#Replace to have only 1 taxon name for minkes
+pcscores_taxa_res[pcscores_taxa_res == "B.acutorostrata"] <- "B.bonaerensis"
+
+#Nice PCA plot with only  well sampled taxa
+PCA_taxa_res_ggplot <- ggplot(pcscores_taxa_res, aes(x = Comp1, y = Comp2, shape = group, colour = taxon, alpha = category, label = specimens))+
+  geom_point(size = 3)+
+  geom_text_repel(colour = "black", size = 3.5, max.overlaps = 60, show.legend=FALSE)+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  theme_bw()+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
+  ggtitle("PCA residuals selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5)) 
+
+#Visualize plot and save as PDF using menu in bar on the right
+PCA_taxa_res_ggplot
+
+#Make hulls for PCA plot with hulls around taxa
+hulls_taxa_res <- pcscores_taxa_res %>%
+  group_by(taxon) %>%
+  slice(chull(Comp1, Comp2)) %>%
+  rename(x = Comp1, y = Comp2)
+glimpse(hulls_taxa_res)
+
+#Nice PCA plot with hulls around categories
+PCA_taxa_res_hulls_ggplot <- ggplot(pcscores_taxa_res, aes(x = Comp1, y = Comp2, colour = taxon, alpha = category))+
+  geom_point(size = 3, aes(shape = group))+
+  scale_colour_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                      values = mypalette_taxa)+            #legend and color adjustments
+  scale_alpha_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), values = c(0.4, 0.7, 1))+
+  geom_polygon(data = hulls_taxa_res, aes(x = x, y = y, fill = taxon), alpha = .2, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Taxa", labels =  c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), #to be ordered as they appear in tibble
+                    values = mypalette_taxa)+ #must match scale_colour_manual
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_bw()+
+  xlab("PC 1 (11.46%)")+ #copy this from standard PCA plot (PCA_res_plot)
+  ylab("PC 2 (7.45%)")+
+  ggtitle("PCA residuals selected taxa")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5))
+
+#Visualize plot and save as PDF using menu in bar on the right
+PCA_taxa_res_hulls_ggplot  
+
+
+#CH. 8 - MORPHOLOGICAL DISPARITY (pc scores) FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis -----
 #Calculate Procrustes variances and distances between groups, with p-value for each pair of groups
 #How different are each group shapes compared to other group shapes?
-#Disparity between stages, considering entire dataset and not different groups
-stage_disparity <- morphol.disparity(coords ~ 1, groups = ~ stage, iter = 999, data = gdf)
 
-#Results and significance
-summary(stage_disparity)
-
-#Save results to file
-sink("Output/stage_disparity.txt")
-print(summary(stage_disparity))
-sink() 
-
-#Disparity between categories, considering entire dataset and not different groups
-category_disparity <- morphol.disparity(coords ~ 1, groups = ~ category, iter = 999, data = gdf)
+#Disparity between categories, not considering groups or taxa
+category_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa, iter = 999)
 
 #Results and significance
 summary(category_disparity)
 
 #Save results to file
-sink("Output/category_disparity.txt")
+sink("bulla_R/category_disparity.txt")
 print(summary(category_disparity))
 sink() 
 
-#Disparity between categories, considering entire dataset AND groups
-category_group_disparity <- morphol.disparity(coords ~ 1, groups = ~ category*group, iter = 999, data = gdf)
+#Disparity between categories, considering groups
+category_group_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa*groups_taxa, iter = 999)
 
 #Results and significance
 summary(category_group_disparity)
 
 #Save results to file
-sink("Output/category_group_disparity.txt")
+sink("bulla_R/category_group_disparity.txt")
 print(summary(category_group_disparity))
 sink() 
 
-#Disparity between groups for each stage - use previously defined dataframe for each stage (early fetus, late fetus, postnatal)
-#Early fetus
-group_disparity_earlyfetus <- morphol.disparity(coords ~ 1, groups = ~ group, iter = 999, data = gdf_earlyfetus)
+#Disparity between categories, considering taxa
+category_taxa_disparity <- morphol.disparity(pcscores_taxa[1:75] ~ 1, groups = ~ categories_taxa*taxa_taxa, iter = 999)
 
 #Results and significance
-summary(group_disparity_earlyfetus)
+summary(category_taxa_disparity)
 
 #Save results to file
-sink("Output/group_disparity_earlyfetus.txt")
-summary(group_disparity_earlyfetus)
+sink("bulla_R/category_taxa_disparity.txt")
+print(summary(category_taxa_disparity))
+sink() 
+
+#Disparity between groups for each stage - use objects with pc scores for each category (early fetus, late fetus) from ANOVAs
+#Create objects for groups for each category (early and late) from pc scores dataset
+groups_taxa_early <- pcscores_taxa_size_early$group
+
+groups_taxa_late <- pcscores_taxa_size_late$group
+
+#Early fetus
+group_disparity_early <- morphol.disparity(pcscores_taxa_size_early[1:75] ~ 1, groups = ~ groups_taxa_early, iter = 999)
+
+#Results and significance
+summary(group_disparity_early)
+
+#Save results to file
+sink("bulla_R/group_disparity_early.txt")
+summary(group_disparity_early)
 sink() 
 
 #Late fetus
-group_disparity_latefetus <- morphol.disparity(coords ~ 1, groups = ~ group, iter = 999, data = gdf_latefetus)
+group_disparity_late <- morphol.disparity(pcscores_taxa_size_late[1:75] ~ 1, groups = ~ groups_taxa_late, iter = 999)
 
 #Results and significance
-summary(group_disparity_latefetus)
+summary(group_disparity_late)
 
 #Save results to file
-sink("Output/group_disparity_latefetus.txt")
-summary(group_disparity_latefetus)
-sink() 
-
-#Postnatal
-group_disparity_postnatal <- morphol.disparity(coords ~ 1, groups = ~ group, iter = 999, data = gdf_postnatal)
-
-#Results and significance
-summary(group_disparity_postnatal)
-
-#Save results to file
-sink("Output/group_disparity_postnatal.txt")
-summary(group_disparity_postnatal)
+sink("bulla_R/group_disparity_latefetus.txt")
+summary(group_disparity_late)
 sink() 
 
 #CH. 9 - TRAJECTORY ANALYSIS ----
@@ -276,7 +299,7 @@ summary(group_trajectory, show.trajectories = TRUE, attribute = "TC", angle.type
 summary(group_trajectory, show.trajectories = TRUE, attribute = "SD") 
 
 #Save results to file
-sink("Output/group_trajectory.txt")
+sink("bulla_R/group_trajectory.txt")
 print("Magnitude difference (absolute difference between path distances)")
 summary(group_trajectory, show.trajectories = TRUE, attribute = "MD") 
 print("Correlations (angles) between trajectories")
