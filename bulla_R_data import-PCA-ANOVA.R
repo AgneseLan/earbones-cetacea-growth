@@ -128,7 +128,7 @@ classifiers <- classifiers %>% mutate(BZW_log = log(BZW), bullaL_log  = log(bull
 
 ##Create object with classifiers only for the best sampled taxa - useful later in analyses
 #Create vector with the names of the best sampled taxa
-#B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#B.bonaerensis/acutorostata (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 best_taxa <- c("B.acutorostrata", "B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata")
 
 #Create new classifiers object
@@ -175,7 +175,7 @@ best_taxa_rows <- c(
   which(classifiers[,4] == "Ph.phocoena"),
   which(classifiers[,4] == "St.attenuata"))
 #Display list of row numbers that do not contain these taxa in order
-omit <- as.vector(setdiff(1:75, best_taxa_rows)) 
+omit <- as.vector(setdiff(1:75, best_taxa_rows)) #1 to max number of observations from raw_dat
 
 #Make new shape array eliminating rows of other taxa from shape array
 shape_array_taxa <- shape_array[,,-omit]
@@ -185,7 +185,7 @@ mean_shape_taxa <- mshape(shape_array_taxa)
 
 #Make new gdf with classifiers for these taxa only
 gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_taxa$code, group = classifiers_taxa$group, 
-                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon,
+                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon, BZW_log = classifiers_taxa$BZW_log
                                 bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
 glimpse(gdf_taxa)
 
