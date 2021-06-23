@@ -185,7 +185,7 @@ mean_shape_taxa <- mshape(shape_array_taxa)
 
 #Make new gdf with classifiers for these taxa only
 gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_taxa$code, group = classifiers_taxa$group, 
-                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon, BZW_log = classifiers_taxa$BZW_log
+                                category = classifiers_taxa$category, taxon = classifiers_taxa$taxon, BZW_log = classifiers_taxa$BZW_log,
                                 bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
 glimpse(gdf_taxa)
 
@@ -453,6 +453,24 @@ summary(reg_PC1all_size)
 print("PC2")
 summary(reg_PC2all_size)
 sink() 
+
+#Check if main components may be associated with group (Mysticeti/Odontoceti)
+reg_PC1all_group <- lm(Comp1 ~ group, data = pcscores_all_size)
+reg_PC2all_group <- lm(Comp2 ~ group, data = pcscores_all_size)
+
+#View results and p-value
+summary(reg_PC1all_group)
+summary(reg_PC2all_group)
+
+#Save results of significant regression to file
+sink("bulla_R/PC1-PC2_group_lm.txt")
+print("PC1")
+summary(reg_PC1all_group)
+
+print("PC2")
+summary(reg_PC2all_group)
+sink() 
+
 
 #CH. 4 - ALLOMETRY ----
 ##Evaluate allometry and get the allometry-free shapes using log bulla length
