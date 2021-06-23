@@ -437,7 +437,6 @@ bullaL_log_conf_intervals <- data.frame(bullaL_log_newX, bullaL_log_newY)
 bullaL_log_conf_intervals <- rename(bullaL_log_conf_intervals, bullaL_log = fit)
 bullaL_log_conf_intervals
 
-#!!!RE-SAVE THE NEXT 4 PLOTS ----
 #Plot
 allometry_bullaL_log_int_plot <- ggplot(bulla_meas, aes(y = bullaL_log, x = BZW_log, fill = group, color = group)) +
   geom_smooth(data = bullaL_log_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
@@ -559,7 +558,8 @@ allometry_perioticW_log_int_plot
 #ggtitle ("Log-transformed BZW vs Periotic width by group - p-value < 0.001*** (group p < 0.001***)")+  #copy from model summary
 
 #All best models plots together
-grid.arrange(allometry_bullaL_log_int_plot,  allometry_perioticL_log_int_plot, allometry_bullaW_log_int_plot, allometry_perioticW_log_int_plot)
+grid.arrange(allometry_bullaL_log_int_plot,  allometry_perioticL_log_int_plot, 
+             allometry_bullaW_log_int_plot, allometry_perioticW_log_int_plot)
 
 #CH. 5 - ALLOMETRY OF BULLA AND PERIOTIC MEASURAMENTS FOR EACH TAXON (ANCOVA) ----
 #Differences in allometry between best sampled taxa in dataset,
