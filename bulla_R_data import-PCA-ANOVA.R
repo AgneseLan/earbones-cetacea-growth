@@ -64,7 +64,7 @@ sink()
 ##Order classifiers by category, useful for plot legend
 #Make factor for variable
 classifiers$category <- factor(classifiers$category, 
-                            levels = c("early", "late", "born")) 
+                            levels = c("early", "late", "postnatal")) 
 #Order
 classifiers <- classifiers[order(classifiers$category),]
 #Check
@@ -217,9 +217,9 @@ mypalette_taxa <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Od
 mypalette_taxa_image <- image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
                                   ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-#Palette for categories - early, late, born
+#Palette for categories - early, late, postnatal
 mypalette_category <- c(mypalette_blue[3,], mypalette_blue[9,], mypalette_blue[16,])
-mypalette_category_image <- image(1:3, 1, as.matrix(1:3), col = mypalette_category, xlab = "categories colors - early, late, born", ylab = "", yaxt = "n")
+mypalette_category_image <- image(1:3, 1, as.matrix(1:3), col = mypalette_category, xlab = "categories colors - early, late, postnatal", ylab = "", yaxt = "n")
 
 #Create shape palette for groups
 shapes <- c(15,19) #these are a square and a circle, use ?pch to see more shapes
@@ -819,7 +819,7 @@ allometry_pcscores_taxa_group_ggplot <- ggplot(allometry_pcscores_taxa_group_tib
   geom_smooth(aes(x = size, y = RegScores, colour =  group, fill = group, linetype = group), method = 'lm', inherit.aes = F,         #confidence intervals and reg line, before points
               alpha = 0.3, size = 1, show.legend = F)+ #should be straight regression line with confidence interval in grey
   geom_point(size = 3, alpha = 0.3)+       #points after, so they are on top
-  scale_color_manual(values = c(mypalette_taxa[1],mypalette_taxa[3]), #select colors from palette from taxa
+  scale_color_manual(values = c(mypalette_taxa[2],mypalette_taxa[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+          
   scale_shape_manual(name = "Taxa", labels = c("B.bonaerensis", "B.physalus", "Ph.phocoena", "St.attenuata"), values = shapes_taxa)+
   theme_classic(base_size = 12)+
@@ -831,8 +831,8 @@ allometry_pcscores_taxa_group_ggplot <- ggplot(allometry_pcscores_taxa_group_tib
         legend.position = "bottom", legend.direction = "horizontal")
 #Add silhouettes groups
 allometry_pcscores_taxa_group_ggplot <- allometry_pcscores_taxa_group_ggplot   + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -10, ysize = 2.8, color = mypalette_taxa[1])+
-  add_phylopic(St.attenuata, alpha = 1, x = 3, y = 7, ysize = 2.5, color = mypalette_taxa[3])
+  add_phylopic(B.physalus, alpha = 1, x = 3.8, y = -10, ysize = 2.8, color = mypalette_taxa[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 3, y = 7, ysize = 2.5, color = mypalette_taxa[4])
 #Visualize plot and save as PDF using menu in bar on the right
 allometry_pcscores_taxa_group_ggplot
 
@@ -963,7 +963,7 @@ allometry_pcscores_taxa_ggplot
 #Repeat same analyses but using pc scores for each category
 #Uneven mysticetes sampling, only group analyses possible for each category
 
-#Create objects for each category - born is not used since not enough postnatal Mysticeti in dataset
+#Create objects for each category - postnatal is not used since not enough postnatal Mysticeti in dataset
 pcscores_taxa_size_early <- pcscores_taxa_size %>% filter(category %in% "early")
 
 pcscores_taxa_size_late <- pcscores_taxa_size %>% filter(category %in% "late")
