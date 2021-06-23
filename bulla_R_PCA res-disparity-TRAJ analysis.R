@@ -259,52 +259,36 @@ sink("bulla_R/group_disparity_latefetus.txt")
 summary(group_disparity_late)
 sink() 
 
-#CH. 9 - TRAJECTORY ANALYSIS ----
-#Shows trajectories of shape variation, possible to compare trajectories of growth bewteen odontocetes and mysticetes
-
-##BEFORE doing this make sure to re-import the classifiers file and re-order it (problems with previous category names) and add it again to the gdf
-#Import classifiers for analyses, make sure they are in the same order as coordinates
-classifiers <- read_csv("Data/bulla_classifiers.csv")
-
-##Order classifiers by stage, useful for plot legend
-#Make factor for variable
-classifiers$stage <- factor(classifiers$stage, 
-                            levels = c("earlyFetus", "lateFetus", "neonate", "juvenile", "adult")) #copy from string printed with the code above
-#Order
-classifiers <- classifiers[order(classifiers$stage),]
-
-##Make data frame for analyses in geomorph
-gdf <- geomorph.data.frame(coords = shape_array, 
-                           code = classifiers$code, group = classifiers$group, 
-                           stage = classifiers$stage, category = classifiers$category,
-                           bulla_log = classifiers$bullaL_log, periotic_log = classifiers$perioticL_log)
-
+#CH. 9 - TRAJECTORY ANALYSIS - entire dataset used for analysis ----
+#Shows trajectories of shape variation, possible to compare trajectories of growth between odontocetes and mysticetes
+#Use original shape data, entire dataset to account for uneven sampling
+#Uneven sampling doesn't allow to look at the best sampled taxa separately
 
 #First perform procD.lm to create linear model that describes what we are trying to test - shape changes at each stage (category) considering the 2 groups
-fit_shape_stage_group <- procD.lm(coords ~ group * category, iter = 499, data = gdf, RRPP = F)
+fit_category_group <- procD.lm(coords ~ group * category, iter = 499, data = gdf, RRPP = F)
 
 #Check that there is a significant correlation
-summary(fit_shape_stage_group)
+summary(fit_category_group)
 
 #Use fit to calculate trajectories
-group_trajectory <- trajectory.analysis(fit_shape_stage_group, groups = gdf$group, traj.pts = gdf$category, 
+group_trajectory <- trajectory.analysis(fit_category_group, groups = gdf$group, traj.pts = gdf$category, 
                                         pca = TRUE, print.progress = TRUE) 
 
 #View results
-#Magnitude differences between trajectories, standard summary - are trajectories different?
+#Magnitude differences between trajectories, standard summary -  difference in path lengths of trajectories between the 2 groups
 summary(group_trajectory, show.trajectories = TRUE, attribute = "MD") 
-#Trajectory correlations - are the trajectories of the 2 groups correlated?
+#Trajectory correlations - angular differences between trajectory principal axes for the 2 groups
 summary(group_trajectory, show.trajectories = TRUE, attribute = "TC", angle.type = "deg")
-#Trajectory shape differences - what is the distance between trajectories?
+#Trajectory shape differences - "Procrustes" distance between trajectories of the 2 groups
 summary(group_trajectory, show.trajectories = TRUE, attribute = "SD") 
 
 #Save results to file
 sink("bulla_R/group_trajectory.txt")
-print("Magnitude difference (absolute difference between path distances)")
+print("Magnitude difference (difference in path lengths of trajectories)")
 summary(group_trajectory, show.trajectories = TRUE, attribute = "MD") 
-print("Correlations (angles) between trajectories")
+print("Correlations (angles) between trajectories (angular differences between trajectory principal axes)")
 summary(group_trajectory, show.trajectories = TRUE, attribute = "TC", angle.type = "deg")
-print("Shape differences between trajectory vectors")
+print("Shape differences between trajectory vectors (Procrustes distance between trajectories)")
 summary(group_trajectory, show.trajectories = TRUE, attribute = "SD") 
 sink() 
 
@@ -316,8 +300,7 @@ add.trajectories(group_trajectory_plot,
                  traj.pch = c(21, 22), traj.col = 1, traj.lty = 1, traj.lwd = 1, traj.cex = 1.5, traj.bg = 1, 
                  start.bg = "green", end.bg = "red") #trajectory line graphics
 #Add legend to see which trajectory belongs to each group
-legend(x= -20, y = 10, legend = c("Mysticeti","Odontoceti"), pch =  c(21, 22), pt.bg = 1)
-
+legend(x= -15, y = -10, legend = c("Mysticeti","Odontoceti"), pch =  c(21, 22), pt.bg = 1)
 
 ##Make better PCA plot using ggplot
 #Read PC scores as tibble
@@ -337,33 +320,44 @@ group_trajectory_pcscores_means <- group_trajectory_pcscores_means %>% rename(x 
 group_trajectory_pcscores_means
 
 #Nice plot
-group_trajectory_ggplot <- ggplot(group_trajectory_pcscores, aes(x = PC1, y = PC2, colour = category, shape = group))+
-  geom_point(size = 3, alpha = 0.4)+
-  geom_point(data = group_trajectory_pcscores_means, aes(x = x, y = y, colour = category, shape = group), size = 5)+
+group_trajectory_ggplot <- ggplot(group_trajectory_pcscores, aes(x = PC1, y = PC2, shape = group, alpha = category))+
+  geom_point(size = 3, colour = "darkgray")+
+  geom_point(data = group_trajectory_pcscores_means, aes(x = x, y = y, colour = group, shape = group, alpha = category), size = 5, inherit.aes = F)+
   #add trajectory lines, one line for each, write row number from tibble, should be in order as legend of plot
   geom_segment(data = group_trajectory_pcscores_means, aes(x = x[1], y = y[1],  #earlyfetusMyst
                                                            xend =  x[2], yend = y[2], colour = age), #latefetusMyst
-               colour = "gray17", size = 1, linejoin = 'mitre', linetype = 1, arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"))+
+               colour = mypalette_taxa[2], size = 1.2, linejoin = 'mitre', linetype = 1, 
+               arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"), show.legend = F)+
   #add arrow at end  
   geom_segment(data = group_trajectory_pcscores_means, aes(x = x[2], y = y[2], #latefetusMyst
                                                            xend = x[3], yend = y[3], colour = age), #postnatalMyst
-               colour = "gray17", size = 1, linejoin = 'mitre', linetype = 1, arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"))+
+               colour = mypalette_taxa[2], size = 1.2, linejoin = 'mitre', linetype = 1, 
+               arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"), show.legend = F)+
   #add trajectory lines, one line for each, write row number from tibble, should be in order as legend of plot
   geom_segment(data = group_trajectory_pcscores_means, aes(x = x[4], y = y[4],  #earlyfetusOdont
                                                            xend =  x[5], yend = y[5], colour = age), #latefetusOdont
-               colour = "gray17", size = 1, linejoin = 'mitre', linetype = 2, arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"))+
+               colour = mypalette_taxa[4], size = 1.2, linejoin = 'mitre', linetype = 2, 
+               arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"), show.legend = F)+
   #add arrow at end  
   geom_segment(data = group_trajectory_pcscores_means, aes(x = x[5], y = y[5], #latefetusOdont
                                                            xend = x[6], yend = y[6], colour = age), #postnatalOdont
-               colour = "gray17", size = 1, linejoin = 'mitre', linetype = 2, arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"))+
-  scale_colour_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
-                      values = c(mypalette_category[1:2], mypalette_category[4]))+            #legend and color adjustments
+               colour = mypalette_taxa[4], size = 1.2, linejoin = 'mitre', linetype = 2, 
+               arrow = arrow(angle = 30, length = unit(0.03, "npc"), ends = "last", type = "closed"), show.legend = F)+
+  scale_alpha_manual(name = "Growth stage", labels = c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
+                     values = c(0.4, 0.7, 1))+            #legend and color adjustments
   scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  scale_colour_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = c(mypalette_taxa[2], mypalette_taxa[4]))+
   theme_bw()+
-  xlab("PC 1 (58.42%)")+ #copy this from standard trajectory plot
-  ylab("PC 2 (16.05%)")+
+  xlab("PC 1 (60.24%)")+ #copy this from standard trajectory plot
+  ylab("PC 2 (14.8%)")+
   ggtitle("Trajectories of growth by group")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5))  #title font and position
-
+  guides(shape = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)), 
+         colour = guide_legend(label = F, title = NULL))+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "horizontal")
+#Add silhouettes groups
+group_trajectory_ggplot <- group_trajectory_ggplot   + 
+  add_phylopic(B.physalus, alpha = 1, x = -5, y = -7, ysize = 1.8, color = mypalette_taxa[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 0, y = 2.5, ysize = 1.7, color = mypalette_taxa[4])
 #Visualize plot and save as PDF using menu in bar on the right
 group_trajectory_ggplot
+
