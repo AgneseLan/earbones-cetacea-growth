@@ -716,6 +716,23 @@ print("II")
 summary(reg_axis2_size)
 sink() 
 
+#Check if main components may be associated with group (Mysticeti/Odontoceti)
+reg_axis1_group <- lm(axis1 ~ group, data = ordination_scores_size)
+reg_axis2_group <- lm(axis2 ~ group, data = ordination_scores_size)
+
+#View results and p-value
+summary(reg_axis1_group)
+summary(reg_axis2_group)
+
+#Save results of significant regression to file
+sink("periotic_R/axis1-axis2_group_lm.txt")
+print("I")
+summary(reg_PC1all_group)
+
+print("II")
+summary(reg_PC2all_group)
+sink() 
+
 #CH. 6 - ANOVA OF SHAPE (pc scores) AND SIZE FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis  ----
 #Conduct ANOVA to test if there is significant difference in allometry between groups (Mysticeti, Odontoceti) or between each taxon
 #Also check if difference varies at different growth categories
