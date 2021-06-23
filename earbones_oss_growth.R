@@ -437,12 +437,13 @@ bullaL_log_conf_intervals <- data.frame(bullaL_log_newX, bullaL_log_newY)
 bullaL_log_conf_intervals <- rename(bullaL_log_conf_intervals, bullaL_log = fit)
 bullaL_log_conf_intervals
 
+#!!!RE-SAVE THE NEXT 4 PLOTS ----
 #Plot
 allometry_bullaL_log_int_plot <- ggplot(bulla_meas, aes(y = bullaL_log, x = BZW_log, fill = group, color = group)) +
   geom_smooth(data = bullaL_log_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
               size = 0.8, alpha = 0.3, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
   geom_point(size = 3, alpha = 0.2)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[1],mypalette_earbones[3]), #select colors from palette from taxa
+  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[2],mypalette_earbones[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+         
   theme_classic(base_size = 12)+
   xlab("Log(BZW)")+
@@ -452,8 +453,8 @@ allometry_bullaL_log_int_plot <- ggplot(bulla_meas, aes(y = bullaL_log, x = BZW_
         axis.title.y = element_text(face = "bold", vjust = 2, size = 14))
 allometry_bullaL_log_int_plot <- move_layers(allometry_bullaL_log_int_plot, "GeomPoint", position = "top")
 allometry_bullaL_log_int_plot <- allometry_bullaL_log_int_plot + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 4.5, y = 4, ysize = 0.28, color = mypalette_earbones[1])+
-  add_phylopic(St.attenuata, alpha = 1, x = 5.2, y = 3, ysize = 0.25, color = mypalette_earbones[3])
+  add_phylopic(B.physalus, alpha = 1, x = 4.5, y = 4, ysize = 0.28, color = mypalette_earbones[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 5.2, y = 3, ysize = 0.25, color = mypalette_earbones[4])
 allometry_bullaL_log_int_plot
 
 # ggtitle ("Log-transformed BZW vs Bulla length by group - p-value < 0.001***")+  #copy from model summary
@@ -475,7 +476,7 @@ allometry_bullaW_log_int_plot <- ggplot(bulla_meas, aes(y = bullaW_log, x = BZW_
   geom_smooth(data = bullaW_log_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
               size = 0.8, alpha = 0.3, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
   geom_point(size = 3, alpha = 0.2)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[1],mypalette_earbones[3]), #select colors from palette from taxa
+  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[2],mypalette_earbones[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+         
   theme_classic(base_size = 12)+
   xlab("Log(BZW)")+
@@ -485,8 +486,8 @@ allometry_bullaW_log_int_plot <- ggplot(bulla_meas, aes(y = bullaW_log, x = BZW_
         axis.title.y = element_text(face = "bold", vjust = 2, size = 14))
 allometry_bullaW_log_int_plot <- move_layers(allometry_bullaW_log_int_plot, "GeomPoint", position = "top")
 allometry_bullaW_log_int_plot <- allometry_bullaW_log_int_plot + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 4.5, y = 3.8, ysize = 0.28, color = mypalette_earbones[1])+
-  add_phylopic(St.attenuata, alpha = 1, x = 5.2, y = 2.7, ysize = 0.25, color = mypalette_earbones[3])
+  add_phylopic(B.physalus, alpha = 1, x = 4.5, y = 3.8, ysize = 0.28, color = mypalette_earbones[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 5.2, y = 2.7, ysize = 0.25, color = mypalette_earbones[4])
 allometry_bullaW_log_int_plot
 
 #ggtitle ("Log-transformed BZW vs Bulla width by group - p-value < 0.001***")+  #copy from model summary
@@ -508,7 +509,7 @@ allometry_perioticL_log_int_plot <- ggplot(periotic_meas, aes(y = perioticL_log,
   geom_smooth(data = perioticL_log_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
               size = 0.8, alpha = 0.3, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
   geom_point(size = 3, alpha = 0.2)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[1],mypalette_earbones[3]), #select colors from palette from taxa
+  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[2],mypalette_earbones[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+         
   theme_classic(base_size = 12)+
   xlab("Log(BZW)")+
@@ -518,8 +519,8 @@ allometry_perioticL_log_int_plot <- ggplot(periotic_meas, aes(y = perioticL_log,
         axis.title.y = element_text(face = "bold", vjust = 2, size = 14))
 allometry_perioticL_log_int_plot <- move_layers(allometry_perioticL_log_int_plot, "GeomPoint", position = "top")
 allometry_perioticL_log_int_plot <- allometry_perioticL_log_int_plot + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 4.7, y = 4.2, ysize = 0.28, color = mypalette_earbones[1])+
-  add_phylopic(St.attenuata, alpha = 1, x = 5.5, y = 3.2, ysize = 0.25, color = mypalette_earbones[3])
+  add_phylopic(B.physalus, alpha = 1, x = 4.7, y = 4.2, ysize = 0.28, color = mypalette_earbones[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 5.5, y = 3.2, ysize = 0.25, color = mypalette_earbones[4])
 allometry_perioticL_log_int_plot
 
 #ggtitle ("Log-transformed BZW vs Periotic length by group - p-value < 0.001***")+  #copy from model summary
@@ -541,7 +542,7 @@ allometry_perioticW_log_int_plot <- ggplot(periotic_meas, aes(y = perioticW_log,
   geom_smooth(data = perioticW_log_conf_intervals, aes(ymin = lwr, ymax = upr, fill = group, colour = group, linetype = group), stat = 'identity',          #confidence intervals and reg line, before points
               size = 0.8, alpha = 0.3, show.legend = F)+      #put col and other graphics OUTSIDE of aes()!!!
   geom_point(size = 3, alpha = 0.2)+       #points after, so they are on top
-  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[1],mypalette_earbones[3]), #select colors from palette from taxa
+  scale_color_manual(name = "Groups", labels  = c("Mysticeti", "Odontoceti"), values = c(mypalette_earbones[2],mypalette_earbones[4]), #select colors from palette from taxa
                      aesthetics = c("color","fill"))+         
   theme_classic(base_size = 12)+
   xlab("Log(BZW)")+
@@ -551,8 +552,8 @@ allometry_perioticW_log_int_plot <- ggplot(periotic_meas, aes(y = perioticW_log,
         axis.title.y = element_text(face = "bold", vjust = 2, size = 14))
 allometry_perioticW_log_int_plot <- move_layers(allometry_perioticW_log_int_plot, "GeomPoint", position = "top")
 allometry_perioticW_log_int_plot <- allometry_perioticW_log_int_plot + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 4.7, y = 3.6, ysize = 0.18, color = mypalette_earbones[1])+
-  add_phylopic(St.attenuata, alpha = 1, x = 5.5, y = 2.8, ysize = 0.16, color = mypalette_earbones[3])
+  add_phylopic(B.physalus, alpha = 1, x = 4.7, y = 3.6, ysize = 0.18, color = mypalette_earbones[2])+
+  add_phylopic(St.attenuata, alpha = 1, x = 5.5, y = 2.8, ysize = 0.16, color = mypalette_earbones[4])
 allometry_perioticW_log_int_plot
 
 #ggtitle ("Log-transformed BZW vs Periotic width by group - p-value < 0.001*** (group p < 0.001***)")+  #copy from model summary
