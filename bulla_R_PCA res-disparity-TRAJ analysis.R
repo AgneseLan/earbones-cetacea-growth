@@ -13,6 +13,7 @@ library(gginnards)
 library(ggphylomorpho)
 library(ggfortify)
 library(borealis)
+library(RColorBrewer)
 library(ggthemes)
 library(ggpubr)
 library(ggplotify)
@@ -193,6 +194,40 @@ PCA_taxa_res_hulls_ggplot <- ggplot(pcscores_taxa_res, aes(x = Comp1, y = Comp2,
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_taxa_res_hulls_ggplot  
 
+##Regression PC1 and PC2 res vs group and category ----
+#Check if main components may be associated with group (Mysticeti/Odontoceti)
+reg_PC1res_group <- lm(Comp1 ~ group, data = pcscores_res)
+reg_PC2res_group <- lm(Comp2 ~ group, data = pcscores_res)
+
+#View results and p-value
+summary(reg_PC1res_group)
+summary(reg_PC2res_group)
+
+#Save results of significant regression to file
+sink("bulla_R/PC1-PC2_res_group_lm.txt")
+print("PC1")
+summary(reg_PC1res_group)
+
+print("PC2")
+summary(reg_PC2res_group)
+sink() 
+
+#Check if main components may be associated with category (early, late, postnatal)
+reg_PC1res_category <- lm(Comp1 ~ category, data = pcscores_res)
+reg_PC2res_category <- lm(Comp2 ~ category, data = pcscores_res)
+
+#View results and p-value
+summary(reg_PC1res_category)
+summary(reg_PC2res_category)
+
+#Save results of significant regression to file
+sink("bulla_R/PC1-PC2_res_category_lm.txt")
+print("PC1")
+summary(reg_PC1res_category)
+
+print("PC2")
+summary(reg_PC2res_category)
+sink() 
 
 #CH. 8 - MORPHOLOGICAL DISPARITY (pc scores) FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis -----
 #Calculate Procrustes variances and distances between groups, with p-value for each pair of groups
