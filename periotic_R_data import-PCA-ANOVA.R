@@ -14,6 +14,7 @@ library(gginnards)
 library(ggphylomorpho)
 library(ggfortify)
 library(borealis)
+library(RColorBrewer)
 library(ggthemes)
 library(ggpubr)
 library(ggplotify)
@@ -186,33 +187,20 @@ gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_ta
                                 bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
 glimpse(gdf_taxa)
 
-
-##Make palette with ggthemes - color and/or shapes
-#Palettes from ggthemes_data
+##Make palette with ggthemes-RColorBrewer - color and/or shapes
 mypalette_blue <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["ordered-sequential"]][["Blue"]][["value"]])
 image(1:20, 1, as.matrix(1:20), col = mypalette_blue, xlab = "Blue",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
-image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
+
+mypalette_paired <- brewer.pal(12,"Paired")
+image(1:12, 1, as.matrix(1:12), col = mypalette_paired, xlab = "Paired",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-#Palette for 4 best sampled taxa - B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#Palette for 4 best sampled taxa - B.bonaerensis/acutorostrata (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 #same colors/taxa as growth and allometry project
-mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
-                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,],mypalette_tableau20[16,], 
-                         mypalette_tableau20[18,], mypalette_tableau20[20,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Mysticeti, xlab = "Mysticeti",
+mypalette_taxa <- c(mypalette_paired[4], mypalette_paired[3], mypalette_paired[9], mypalette_paired[10])
+image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
-                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,], mypalette_tableau20[15,], 
-                          mypalette_tableau20[17,], mypalette_tableau20[19,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Odontoceti, xlab = "Odontoceti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_taxa <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Odontoceti[1], mypalette_Odontoceti[6])
-mypalette_taxa_image <- image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
-                              ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
 #Palette for categories - early, late, postnatal
 mypalette_category <- c(mypalette_blue[3,], mypalette_blue[9,], mypalette_blue[16,])
