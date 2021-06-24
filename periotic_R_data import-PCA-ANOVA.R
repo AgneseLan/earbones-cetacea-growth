@@ -14,6 +14,7 @@ library(gginnards)
 library(ggphylomorpho)
 library(ggfortify)
 library(borealis)
+library(RColorBrewer)
 library(ggthemes)
 library(ggpubr)
 library(ggplotify)
@@ -186,33 +187,20 @@ gdf_taxa <- geomorph.data.frame(coords = shape_array_taxa, code = classifiers_ta
                                 bulla_log = classifiers_taxa$bullaL_log, periotic_log = classifiers_taxa$perioticL_log)
 glimpse(gdf_taxa)
 
-
-##Make palette with ggthemes - color and/or shapes
-#Palettes from ggthemes_data
+##Make palette with ggthemes-RColorBrewer - color and/or shapes
 mypalette_blue <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["ordered-sequential"]][["Blue"]][["value"]])
 image(1:20, 1, as.matrix(1:20), col = mypalette_blue, xlab = "Blue",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
-image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
+
+mypalette_paired <- brewer.pal(12,"Paired")
+image(1:12, 1, as.matrix(1:12), col = mypalette_paired, xlab = "Paired",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-#Palette for 4 best sampled taxa - B.bonaerensis (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
+#Palette for 4 best sampled taxa - B.bonaerensis/acutorostrata (Mysticeti), B.physalus (Mysticeti), Ph. phocoena (Odontoceti), St.attenuata (Odontoceti)
 #same colors/taxa as growth and allometry project
-mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
-                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,],mypalette_tableau20[16,], 
-                         mypalette_tableau20[18,], mypalette_tableau20[20,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Mysticeti, xlab = "Mysticeti",
+mypalette_taxa <- c(mypalette_paired[4], mypalette_paired[3], mypalette_paired[9], mypalette_paired[10])
+image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
-                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,], mypalette_tableau20[15,], 
-                          mypalette_tableau20[17,], mypalette_tableau20[19,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Odontoceti, xlab = "Odontoceti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_taxa <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Odontoceti[1], mypalette_Odontoceti[6])
-mypalette_taxa_image <- image(1:4, 1, as.matrix(1:4), col = mypalette_taxa, xlab = "taxa colors - B.bona, B.phys, Phoc., Sten.",
-                              ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
 #Palette for categories - early, late, postnatal
 mypalette_category <- c(mypalette_blue[3,], mypalette_blue[9,], mypalette_blue[16,])
@@ -431,7 +419,7 @@ PCA_taxa_hulls_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, colour 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_taxa_hulls_ggplot  
 
-##Regression PC1 and PC2 vs periotic length ----
+##Regression PC1 and PC2 vs size (periotic log length), group, category ----
 #Check if size an important factor in results overall
 #Create data frame with data
 pcscores_all_size <- pcscores_all %>% mutate(size = gdf$periotic_log)
@@ -468,6 +456,23 @@ summary(reg_PC1all_group)
 
 print("PC2")
 summary(reg_PC2all_group)
+sink() 
+
+#Check if main components may be associated with category (early, late, postnatal)
+reg_PC1all_category <- lm(Comp1 ~ category, data = pcscores_all_size)
+reg_PC2all_category <- lm(Comp2 ~ category, data = pcscores_all_size)
+
+#View results and p-value
+summary(reg_PC1all_category)
+summary(reg_PC2all_category)
+
+#Save results of significant regression to file
+sink("periotic_R/PC1-PC2_category_lm.txt")
+print("PC1")
+summary(reg_PC1all_category)
+
+print("PC2")
+summary(reg_PC2all_category)
 sink() 
 
 #CH. 4 - ALLOMETRY ----
@@ -694,7 +699,7 @@ ordination_scores_taxa_hulls_ggplot <- ggplot(ordination_scores_taxa, aes(x = ax
 #Visualize plot and save as PDF using menu in bar on the right
 ordination_scores_taxa_hulls_ggplot  
 
-##Regression Axis1 and Axis2 vs periotic length ----
+##Regression Axis1 and Axis2 vs size (periotic log length), group, category ----
 #Check if size an important factor in results overall
 #Create data frame with data
 ordination_scores_size <- ordination_scores %>% mutate(size = gdf$periotic_log)
@@ -727,10 +732,27 @@ summary(reg_axis2_group)
 #Save results of significant regression to file
 sink("periotic_R/axis1-axis2_group_lm.txt")
 print("I")
-summary(reg_PC1all_group)
+summary(reg_axis1_group)
 
 print("II")
-summary(reg_PC2all_group)
+summary(reg_axis2_group)
+sink() 
+
+#Check if main components may be associated with category (early, late, postnatal)
+reg_axis1_category <- lm(axis1 ~ category, data = ordination_scores_size)
+reg_axis2_category <- lm(axis2 ~ category, data = ordination_scores_size)
+
+#View results and p-value
+summary(reg_axis1_category)
+summary(reg_axis2_category)
+
+#Save results of significant regression to file
+sink("periotic_R/axis1-axis2_category_lm.txt")
+print("I")
+summary(reg_axis1_category)
+
+print("II")
+summary(reg_axis2_category)
 sink() 
 
 #CH. 6 - ANOVA OF SHAPE (pc scores) AND SIZE FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis  ----
