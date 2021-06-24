@@ -149,24 +149,12 @@ ossification_seq_St.attenuata <- ossification_seq_St.attenuata  %>% mutate(growt
 ossification_seq <- bind_rows(ossification_seq_B.bonaerensis, ossification_seq_B.physalus,ossification_seq_Ph.phocoena,ossification_seq_St.attenuata)
 
 ##Palettes
-mypalette_tableau20 <- as.matrix(ggthemes_data[["tableau"]][["color-palettes"]][["regular"]][["Tableau 20"]][["value"]])
-image(1:20, 1, as.matrix(1:20), col = mypalette_tableau20, xlab = "Tableau20",
+mypalette_paired <- brewer.pal(12,"Paired")
+image(1:12, 1, as.matrix(1:12), col = mypalette_paired, xlab = "Paired",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
-mypalette_Mysticeti <- c(mypalette_tableau20[2,], mypalette_tableau20[4,], mypalette_tableau20[6,], mypalette_tableau20[8,],
-                         mypalette_tableau20[10,], mypalette_tableau20[12,], mypalette_tableau20[14,],mypalette_tableau20[16,], 
-                         mypalette_tableau20[18,], mypalette_tableau20[20,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Mysticeti, xlab = "Mysticeti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_Odontoceti <- c(mypalette_tableau20[1,], mypalette_tableau20[3,], mypalette_tableau20[5,], mypalette_tableau20[7,],
-                          mypalette_tableau20[9,], mypalette_tableau20[11,], mypalette_tableau20[13,], mypalette_tableau20[15,], 
-                          mypalette_tableau20[17,], mypalette_tableau20[19,])
-image(1:10, 1, as.matrix(1:10), col = mypalette_Odontoceti, xlab = "Odontoceti",
-      ylab = "", xaxt = "n", yaxt = "n", bty = "n")
-
-mypalette_earbones <- c(mypalette_Mysticeti[2], mypalette_Mysticeti[3], mypalette_Odontoceti[1], mypalette_Odontoceti[6],mypalette_tableau20[13:14],"#ffffff", mypalette_Odontoceti[10])
-mypalette_earbones_image <- image(1:8, 1, as.matrix(1:8), col = mypalette_earbones, xlab = "ear bones plots",
+mypalette_earbones <- c(mypalette_paired[4], mypalette_paired[3], mypalette_paired[9], mypalette_paired[10], "#ffffff", "gray38")
+image(1:6, 1, as.matrix(1:6), col = mypalette_earbones, xlab = "ear bones plots",
       ylab = "", xaxt = "n", yaxt = "n", bty = "n")
 
 ##Images for plots
@@ -187,8 +175,8 @@ as.factor(ossification_seq$bone)
 #Match with order species as selected from mypalette_earbones
 as.factor(growth_curve$taxon)
 
-mypalette_earbones_fill <- c(mypalette_earbones[2],mypalette_earbones[1], mypalette_earbones[3:4], 
-                             mypalette_earbones[7],mypalette_earbones[7],mypalette_earbones[7],mypalette_earbones[7])
+mypalette_earbones_fill <- c(mypalette_earbones[2],mypalette_earbones[1],mypalette_earbones[3:4], 
+                             mypalette_earbones[5],mypalette_earbones[5],mypalette_earbones[5],mypalette_earbones[5])
 
 #Plot data species with selected model, specimens and events - % gestation to make plot better
 ossification_earbones <- ggplot(ossification_seq, aes(y = TL_mm, x = Age_100, xend = 1, shape = state,  fill = bone, color = taxon)) + #xend useful to make sure graphs goes close to 0
@@ -209,7 +197,7 @@ ossification_earbones <- ggplot(ossification_seq, aes(y = TL_mm, x = Age_100, xe
   scale_shape_manual(name = "Events", labels  = c("bulla/periotic visible", "processes of bulla/periotic ossified", "bulla/periotic completely ossified"), 
                                                   values = c(21, 22, 24))+
   scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Bulla", "Periotic"))+
-  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[5], linetype = 4)+
+  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[6], linetype = 4)+
   theme_bw()+
   xlab("Age (% gestation)")+
   ylab("Total Length (mm)")+
@@ -242,19 +230,19 @@ ossification_earbones_log <- ggplot(ossification_seq, aes(y = TL_mm_log, x = Age
                inherit.aes = F, fullrange = T,
               linetype = 1, colour = mypalette_earbones[1], show.legend = F)+
   stat_smooth(data = growth_curve_B.physalus, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
-               inherit.aes = F, fullrange = F,
+               inherit.aes = F, fullrange = F, 
               linetype = 1, colour = mypalette_earbones[2], show.legend = F)+ 
   stat_smooth(data = growth_curve_Ph.phocoena, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
+              inherit.aes = F, fullrange = T, 
               linetype = 2, colour = mypalette_earbones[3], show.legend = F)+
   stat_smooth(data = growth_curve_St.attenuata, aes(y = TL_mm_log, x = Age_100), method = lm, formula = y ~ x, se = F, 
-              inherit.aes = F, fullrange = T,
+              inherit.aes = F, fullrange = T, 
               linetype = 2, colour = mypalette_earbones[4], show.legend = F)+
   scale_color_manual(values = mypalette_earbones[1:4])+
   scale_shape_manual(name = "Events", labels  = c("bulla/periotic visible", "processes of bulla/periotic ossified", "bulla/periotic completely ossified"), 
                      values = c(21, 22, 24))+
   scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Bulla", "Periotic"))+
-  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[5], linetype = 4)+
+  geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[6], linetype = 4)+
   theme_bw()+
   xlab("Age (% gestation)")+
   ylab("Log(Total Length)")+
