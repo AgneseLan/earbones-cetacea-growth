@@ -419,7 +419,7 @@ PCA_taxa_hulls_ggplot <- ggplot(pcscores_taxa, aes(x = Comp1, y = Comp2, colour 
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_taxa_hulls_ggplot  
 
-##Regression PC1 and PC2 vs periotic length ----
+##Regression PC1 and PC2 vs size (periotic log length), group, category ----
 #Check if size an important factor in results overall
 #Create data frame with data
 pcscores_all_size <- pcscores_all %>% mutate(size = gdf$periotic_log)
@@ -456,6 +456,23 @@ summary(reg_PC1all_group)
 
 print("PC2")
 summary(reg_PC2all_group)
+sink() 
+
+#Check if main components may be associated with category (early, late, postnatal)
+reg_PC1all_category <- lm(Comp1 ~ category, data = pcscores_all_size)
+reg_PC2all_category <- lm(Comp2 ~ category, data = pcscores_all_size)
+
+#View results and p-value
+summary(reg_PC1all_category)
+summary(reg_PC2all_category)
+
+#Save results of significant regression to file
+sink("periotic_R/PC1-PC2_category_lm.txt")
+print("PC1")
+summary(reg_PC1all_category)
+
+print("PC2")
+summary(reg_PC2all_category)
 sink() 
 
 #CH. 4 - ALLOMETRY ----
@@ -682,7 +699,7 @@ ordination_scores_taxa_hulls_ggplot <- ggplot(ordination_scores_taxa, aes(x = ax
 #Visualize plot and save as PDF using menu in bar on the right
 ordination_scores_taxa_hulls_ggplot  
 
-##Regression Axis1 and Axis2 vs periotic length ----
+##Regression Axis1 and Axis2 vs size (periotic log length), group, category ----
 #Check if size an important factor in results overall
 #Create data frame with data
 ordination_scores_size <- ordination_scores %>% mutate(size = gdf$periotic_log)
@@ -715,10 +732,27 @@ summary(reg_axis2_group)
 #Save results of significant regression to file
 sink("periotic_R/axis1-axis2_group_lm.txt")
 print("I")
-summary(reg_PC1all_group)
+summary(reg_axis1_group)
 
 print("II")
-summary(reg_PC2all_group)
+summary(reg_axis2_group)
+sink() 
+
+#Check if main components may be associated with category (early, late, postnatal)
+reg_axis1_category <- lm(axis1 ~ category, data = ordination_scores_size)
+reg_axis2_category <- lm(axis2 ~ category, data = ordination_scores_size)
+
+#View results and p-value
+summary(reg_axis1_category)
+summary(reg_axis2_category)
+
+#Save results of significant regression to file
+sink("periotic_R/axis1-axis2_category_lm.txt")
+print("I")
+summary(reg_axis1_category)
+
+print("II")
+summary(reg_axis2_category)
 sink() 
 
 #CH. 6 - ANOVA OF SHAPE (pc scores) AND SIZE FOR GROUPS, TAXA, GROWTH CATEGORY - only well sampled taxa used for analysis  ----
