@@ -220,6 +220,8 @@ ossification_earbones <- ossification_earbones +
   add_phylopic(St.attenuata, alpha = 1, x = 90, y = 1300, ysize = 600, color = mypalette_earbones[4])
 ossification_earbones
 
+
+
 #Plot log data both groups with selected model, specimens and events
 ossification_earbones_log <- ggplot(ossification_seq, aes(y = TL_mm_log, x = Age_100, xend = 1, shape = state, fill = bone, color = taxon)) + #xend useful to make sure graphs goes close to 0
   geom_point(size = 4)+ 
