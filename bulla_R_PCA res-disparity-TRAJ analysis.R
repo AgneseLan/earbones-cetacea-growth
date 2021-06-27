@@ -385,10 +385,10 @@ group_trajectory_ggplot <- ggplot(group_trajectory_pcscores, aes(x = PC1, y = PC
   theme_bw()+
   xlab("PC 1 (60.24%)")+ #copy this from standard trajectory plot
   ylab("PC 2 (14.8%)")+
-  ggtitle("Trajectories of growth by group")+
+  ggtitle("Tympanic bulla")+
   guides(shape = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)), 
          colour = guide_legend(label = F, title = NULL))+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "horizontal")
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 16), legend.position = "bottom", legend.direction = "horizontal")
 #Add silhouettes groups
 group_trajectory_ggplot <- group_trajectory_ggplot   + 
   add_phylopic(B.physalus, alpha = 1, x = -5, y = -7, ysize = 1.8, color = mypalette_taxa[2])+

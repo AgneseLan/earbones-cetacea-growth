@@ -311,6 +311,33 @@ PCA_all_hulls_ggplot <- ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = s
 #Visualize plot and save as PDF using menu in bar on the right
 PCA_all_hulls_ggplot  
 
+#Make hulls for PCA plot with hulls around groups
+hulls_all_groups <- pcscores_all %>%
+  group_by(group) %>%
+  slice(chull(Comp1, Comp2)) %>%
+  rename(x = Comp1, y = Comp2)
+glimpse(hulls_all_groups)
+
+#Nice PCA plot with hulls around categories and groups
+PCA_all_hulls_group_ggplot <-  ggplot(pcscores_all, aes(x = Comp1, y = Comp2, label = specimens, colour = category, fill = category))+
+  geom_point(size = 3, aes(shape = group))+
+  scale_colour_manual(name = "Growth category", labels =  c("Early Fetus", "Late Fetus", "Postnatal"), #to be ordered as they appear in tibble
+                      values = mypalette_category)+            #legend and color adjustments
+  geom_polygon(data = hulls_all_groups, aes(x = x, y = y, linetype = group, group = group), 
+               colour = "darkgrey", fill = "gray99", size = 1, alpha = .1, inherit.aes = F)+ #hulls with different lines for groups
+  geom_polygon(data = hulls_all, aes(x = x, y = y, fill = category), alpha = .4, size = 0.8, show.legend = FALSE)+ #colored hulls with transparency
+  scale_fill_manual(name = "Growth category", labels = c("Early Fetus", "Late Fetus", "Postnatal"),
+                    values =  mypalette_category)+ #must match scale_colour_manual
+  scale_shape_manual(name = "Group", labels = c("Mysticeti", "Odontoceti"), values = shapes)+
+  theme_bw()+
+  xlab("PC 1 (14.24%)")+ #copy this from standard PCA plot (PCA_all_plot)
+  ylab("PC 2 (9.49%)")+
+  ggtitle("Periotic")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, size = 16),  legend.position = "bottom", legend.direction = "vertical")
+
+#Visualize plot and save as PDF using menu in bar on the right
+PCA_all_hulls_group_ggplot
+
 ##Plots for each category ----
 #PCA plots for each category
 #Create one tibble for each category
@@ -1003,10 +1030,10 @@ allometry_pcscores_taxa_ggplot <- ggplot(allometry_pcscores_taxa_tibble, aes(x =
   scale_shape_manual(values = shapes)+
   theme_classic(base_size = 12)+
   xlab("Log(Periotic length)")+
-  ylab("Regression Score")+
-  ggtitle ("Allometry by taxon - p-value = 0.004**")+  #copy from model summary
+  ylab("Regression Score**")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5), 
-        legend.position = "none", legend.direction = "horizontal")
+        legend.position = "none", legend.direction = "horizontal",
+        axis.title.x = element_text(face = "bold", size = 14))
 #Add silhouettes groups
 allometry_pcscores_taxa_ggplot <- allometry_pcscores_taxa_ggplot   + 
   add_phylopic(B.bonaerensis, alpha = 1, x = 3.8, y = -10, ysize = 3, color = mypalette_taxa[1])+
