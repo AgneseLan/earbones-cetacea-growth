@@ -194,14 +194,13 @@ ossification_earbones <- ggplot(ossification_seq, aes(y = TL_mm, x = Age_100, xe
               inherit.aes = F, fullrange = T,
               linetype = 2, colour = mypalette_earbones[4], show.legend = F)+ 
   scale_color_manual(values = mypalette_earbones[1:4])+
-  scale_shape_manual(name = "Events", labels  = c("bulla/periotic visible", "processes of bulla/periotic ossified", "bulla/periotic completely ossified"), 
-                                                  values = c(21, 22, 24))+
-  scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Bulla", "Periotic"))+
+  scale_shape_manual(name = "Ossification stages", labels  = c("Element visible", "Element shape recognizable", "Element completely ossified"), 
+                     values = c(21, 22, 24))+
+  scale_fill_manual(values = mypalette_earbones_fill,  name = "Element", labels = c("Tympanic bulla", "Periotic"))+
   geom_vline(data = stages, aes(xintercept = Age_100), color = mypalette_earbones[6], linetype = 4)+
   theme_bw()+
   xlab("Age (% gestation)")+
   ylab("Total Length (mm)")+
-  ggtitle("Ossification stages ear bones")+
   theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "vertical")+
   guides(fill = guide_legend(override.aes = list(fill = c("black","white"), shape = 21)), 
          colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))
