@@ -448,7 +448,7 @@ anova(reg_axis1_category)
 anova(reg_axis2_category)
 
 #Save results of regressions to file
-sink("bulla_R/axis1-axis2_lms.txt")
+sink("periotic_R/axis1-axis2_lms.txt")
 print("I size")
 summary(reg_axis1_size)
 anova(reg_axis1_size)
