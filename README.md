@@ -42,7 +42,8 @@ This project is licensed under the MIT License - see the LICENSE.md file for det
 # Session Info 📋
 For reproducibility purposes, here is the output of devtools::session_info() used to perform the analyses in the publication.
 
-`R version 4.1.0 (2021-05-18)
+```
+R version 4.1.0 (2021-05-18)
 Platform: x86_64-w64-mingw32/x64 (64-bit)
 Running under: Windows 10 x64 (build 19043)
 
@@ -81,4 +82,5 @@ loaded via a namespace (and not attached):
  [91] R6_2.5.0                promises_1.2.0.1        rio_0.5.26              codetools_0.2-18        MASS_7.3-54             gtools_3.8.2           
  [97] assertthat_0.2.1        withr_2.4.2             httpcode_0.3.0          mnormt_2.0.2            expm_0.999-6            parallel_4.1.0         
 [103] hms_1.1.0               quadprog_1.5-8          grid_4.1.0              coda_0.19-4             rvcheck_0.1.8           carData_3.0-4          
-[109] numDeriv_2016.8-1.1     scatterplot3d_0.3-41    shiny_1.6.0             lubridate_1.7.10       `
+[109] numDeriv_2016.8-1.1     scatterplot3d_0.3-41    shiny_1.6.0             lubridate_1.7.10      
+```
