@@ -1,7 +1,8 @@
 Data
 allometry
-bulla_R
-periotic_R
+bulla_R*
+periotic_R*
+ossification*
 *.Rproj
 
 # History files
