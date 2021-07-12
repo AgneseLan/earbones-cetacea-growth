@@ -415,35 +415,25 @@ ordination_scores_size <- ordination_scores %>% mutate(size = gdf$periotic_log)
 reg_axis1_size <- lm(axis1 ~ size, data = ordination_scores_size)
 reg_axis2_size <- lm(axis2 ~ size, data = ordination_scores_size)
 
-#View results and p-value
+#View results
 summary(reg_axis1_size)
 summary(reg_axis2_size)
 
-#Save results of significant regression to file
-sink("periotic_R/axis1-axis2_size_lm.txt")
-print("I")
-summary(reg_axis1_size)
-
-print("II")
-summary(reg_axis2_size)
-sink() 
+#ANOVA tables
+anova(reg_axis1_size)
+anova(reg_axis2_size)
 
 #Check if main components may be associated with group (Mysticeti/Odontoceti)
 reg_axis1_group <- lm(axis1 ~ group, data = ordination_scores_size)
 reg_axis2_group <- lm(axis2 ~ group, data = ordination_scores_size)
 
-#View results and p-value
+#View results
 summary(reg_axis1_group)
 summary(reg_axis2_group)
 
-#Save results of significant regression to file
-sink("periotic_R/axis1-axis2_group_lm.txt")
-print("I")
-summary(reg_axis1_group)
-
-print("II")
-summary(reg_axis2_group)
-sink() 
+#ANOVA tables
+anova(reg_axis1_group)
+anova(reg_axis2_group)
 
 #Check if main components may be associated with category (early, late, postnatal)
 reg_axis1_category <- lm(axis1 ~ category, data = ordination_scores_size)
@@ -453,13 +443,35 @@ reg_axis2_category <- lm(axis2 ~ category, data = ordination_scores_size)
 summary(reg_axis1_category)
 summary(reg_axis2_category)
 
-#Save results of significant regression to file
-sink("periotic_R/axis1-axis2_category_lm.txt")
-print("I")
-summary(reg_axis1_category)
+#ANOVA tables
+anova(reg_axis1_category)
+anova(reg_axis2_category)
 
-print("II")
+#Save results of regressions to file
+sink("bulla_R/axis1-axis2_lms.txt")
+print("I size")
+summary(reg_axis1_size)
+anova(reg_axis1_size)
+
+print("II size")
+summary(reg_axis2_size)
+anova(reg_axis2_size)
+
+print("I group")
+summary(reg_axis1_group)
+anova(reg_axis1_group)
+
+print("II group")
+summary(reg_axis2_group)
+anova(reg_axis2_group)
+
+print("I category")
+summary(reg_axis1_category)
+anova(reg_axis1_category)
+
+print("II category")
 summary(reg_axis2_category)
+anova(reg_axis2_category)
 sink() 
 
 #CH. 5 - ANOVA OF SHAPE (pc scores) AND SIZE FOR TAXA - only well sampled taxa used for analysis  ----
