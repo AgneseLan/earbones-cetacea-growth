@@ -201,25 +201,23 @@ ossification_earbones <- ggplot(ossification_seq, aes(y = TL_mm, x = Age_100, xe
   theme_bw()+
   xlab("Age (% gestation)")+
   ylab("Total Length (mm)")+
-  theme(plot.title = element_text(face = "bold", hjust = 0.5), legend.position = "bottom", legend.direction = "vertical")+
+  theme(plot.title = element_text(face = "bold", hjust = 0.5), 
+        legend.position = "bottom", legend.direction = "vertical",
+        axis.title.y = element_text(vjust = 3))+
   guides(fill = guide_legend(override.aes = list(fill = c("black","white"), shape = 21)), 
          colour = guide_legend(label = F, title = NULL, override.aes = list(shape = NA)))
 ossification_earbones <- move_layers(ossification_earbones, "GeomPoint", position = "top")
-ossification_earbones
-
 #Add annotations growth stages
 ossification_earbones <- ossification_earbones + 
-  annotate("text", x = 10, y = 5400, label = "embryo", fontface = "italic", size = 4)+
-  annotate("text", x = 35, y = 5400, label = "early fetus", fontface = "italic", size = 4)+
-  annotate("text", x = 65, y = 5400, label = "late fetus", fontface = "italic", size = 4)
-ossification_earbones
-
+  annotate("text", x = 10, y = 5800, label = "embryo", fontface = "italic", size = 4)+
+  annotate("text", x = 35, y = 5800, label = "early fetus", fontface = "italic", size = 4)+
+  annotate("text", x = 65, y = 5800, label = "late fetus", fontface = "italic", size = 4)
 #Add silhouettes groups
 ossification_earbones <- ossification_earbones + 
-  add_phylopic(B.bonaerensis, alpha = 1, x = 80, y = 2800, ysize = 600, color = mypalette_earbones[1])+
-  add_phylopic(B.physalus, alpha = 1, x = 65, y = 4000, ysize = 600, color = mypalette_earbones[2])+
-  add_phylopic(Ph.phocoena, alpha = 1, x = 90, y = 200, ysize = 700, color = mypalette_earbones[3])+
-  add_phylopic(St.attenuata, alpha = 1, x = 90, y = 1300, ysize = 600, color = mypalette_earbones[4])
+  add_phylopic(B.bonaerensis, alpha = 1, x = 78, y = 2500, ysize = 520, color = mypalette_earbones[1])+
+  add_phylopic(B.physalus, alpha = 1, x = 65, y = 4000, ysize = 580, color = mypalette_earbones[2])+
+  add_phylopic(Ph.phocoena, alpha = 1, x = 90, y = 200, ysize = 630, color = mypalette_earbones[3])+
+  add_phylopic(St.attenuata, alpha = 1, x = 90, y = 1300, ysize = 500, color = mypalette_earbones[4])
 ossification_earbones
 
 #Plot log data both groups with selected model, specimens and events
