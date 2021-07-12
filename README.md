@@ -23,7 +23,7 @@ Data description
 
 
 
-# Analysis 
+## Analysis 
 In this repository you will find raw data (.csv and .xlsx files) and code for analyses (code supplied as .R files)
 
 📁
@@ -36,10 +36,10 @@ As above
 Code for analyses
 list of R files
 
-# License 📃
+## License 📃
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
-# Session Info 📋
+## Session Info 📋
 For reproducibility purposes, here is the output of devtools::session_info() used to perform the analyses in the publication.
 
 ```
