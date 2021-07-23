@@ -64,14 +64,14 @@ attached base packages:
 [1] stats     graphics  grDevices utils     datasets  methods   base     
 
 other attached packages:
- [1] Morpho_2.8          ggplotify_0.0.5     ggpubr_0.4.0        borealis_2021.02.04  ggphylomorpho_0.1.0 geiger_2.0.7       
- ape_5.5            
- [8] gridExtra_2.3       png_0.1-7           rphylopic_0.3.0     ggfortify_0.4.11   gginnards_0.1.0     
- broom_0.7.8         geomorph_4.0.0     
-[15] Matrix_1.3-3        rgl_0.106.8         RRPP_1.0.0          ggthemes_4.2.4      RColorBrewer_1.1-2  
-polynom_1.4-0       ggrepel_0.9.1      
-[22] AICcmodavg_2.3-1    forcats_0.5.1       stringr_1.4.0       purrr_0.3.4       readr_1.4.0         
-tibble_3.1.2        ggplot2_3.3.4      
+ [1] Morpho_2.8          ggplotify_0.0.5     ggpubr_0.4.0        borealis_2021.02.04 
+ ggphylomorpho_0.1.0   geiger_2.0.7      ape_5.5            
+ [8] gridExtra_2.3       png_0.1-7           rphylopic_0.3.0     ggfortify_0.4.11   
+ gginnards_0.1.0     broom_0.7.8         geomorph_4.0.0     
+[15] Matrix_1.3-3        rgl_0.106.8         RRPP_1.0.0          ggthemes_4.2.4      
+RColorBrewer_1.1-2  polynom_1.4-0       ggrepel_0.9.1      
+[22] AICcmodavg_2.3-1    forcats_0.5.1       stringr_1.4.0       purrr_0.3.4     
+readr_1.4.0         tibble_3.1.2        ggplot2_3.3.4      
 [29] tidyverse_1.3.1     dplyr_1.0.7         tidyr_1.1.3        
 
 loaded via a namespace (and not attached):
