@@ -1,4 +1,4 @@
-# Developing echolocation: distinctive patterns in the ontogeny of the tympanoperiotic complex in toothed and baleen whales (Cetacea)
+# Developing echolocation: distinctive patterns in the ontogeny of the tympanoperiotic complex in toothed and baleen whales (Cetacea) 	:dolphin: :whale:
 Analyses of growth allometry and shape change during ontogeny of the bulla and periotic of Cetacea 
 
 Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20Earbones%20Paper%20Code)
