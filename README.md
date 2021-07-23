@@ -34,9 +34,11 @@ Same as for the tympanic bulla.
 In this repository you will find raw data (.csv and data files) and code for analyses (code supplied as .R files)
 
 📁 Raw data
+
 As described above
 
 📁 Code for analyses
+
 ossification_size_allometry_analyses.R
 tympanic_bulla_shape_analyses.R
 periotic_shape_analyses.R
