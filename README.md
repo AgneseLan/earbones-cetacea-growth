@@ -1,7 +1,7 @@
 # Developing echolocation: distinctive patterns in the ontogeny of the tympanoperiotic complex in toothed and baleen whales (Cetacea)
 Analyses of growth allometry and shape change during ontogeny of the bulla and periotic of Cetacea 
 
-Authors: 
+Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20Earbones%20Paper%20Code)
 
 To cite the paper:
 
@@ -15,26 +15,33 @@ To cite this repo:
 
 DOI ZENODO
 
-## Data 
+## Data :floppy_disk: 
 
-The data are provided in the Raw data folder
+The data are provided in the Raw data folder.
 
-Data description
+- Data for size allometry analysis: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* 
+Specimen codes are the same as the ones listed in table S1, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
 
+- Data for shape analysis of the tympanic bulla: *_gpsa_homologized_points_bulla_R.dat, _gpsa_ordination_projections_bulla_R.Rdata, _gpsa_ordination_values_bulla_R.RData, bulla_classifiers.csv*
+Homologized points file contains the coordinates for the aligned points as produced by the GPSA. Ordination projections ar ethe PCOORD valeu also as produced by the GPSA. PCOORD oridination values were copied from the GPSA print out during analysis and the file produced was updated to include also the proportaional and cumulative values. Classifier files contains group, taxon, onotgentic category an measuraments of leght for the bulla and periotic for all specimens. For spciemns codes and numbers see the publiciation and table S1.
 
+- Data for shape analysis of the periotic: *_gpsa_homologized_points_periotic_R.dat, _gpsa_ordination_projections_periotic_R.Rdata, _gpsa_ordination_values_periotic_R.RData, periotic_classifiers.csv*
+Same as for the tympanic bulla.
 
-## Analysis 
-In this repository you will find raw data (.csv and .xlsx files) and code for analyses (code supplied as .R files)
+- Silhouettes of taxa and groups for plots: *b.bona.png, b.physalus.png, phocoena.png, stenella.png*
 
-📁
+## Analysis :computer:
+In this repository you will find raw data (.csv and data files) and code for analyses (code supplied as .R files)
 
-Raw data
-As above
+📁 Raw data
+As described above
 
-📁
+📁 Code for analyses
+ossification_size_allometry_analyses.R
+tympanic_bulla_shape_analyses.R
+periotic_shape_analyses.R
 
-Code for analyses
-list of R files
+Before running analyses, save all the raw data files in a folder called "Data" in the same directory as the R project. This will allow to import the data as detailed in the code provided.
 
 ## License 📃
 This project is licensed under the MIT License - see the LICENSE.md file for details
