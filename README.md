@@ -39,9 +39,7 @@ As described above
 
 📁 Code for analyses
 
-ossification_size_allometry_analyses.R
-tympanic_bulla_shape_analyses.R
-periotic_shape_analyses.R
+*ossification_size_allometry_analyses.R, tympanic_bulla_shape_analyses.R, periotic_shape_analyses.R*
 
 Before running analyses, save all the raw data files in a folder called "Data" in the same directory as the R project. This will allow to import the data as detailed in the code provided.
 
