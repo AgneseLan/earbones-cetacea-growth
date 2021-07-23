@@ -17,7 +17,7 @@ DOI ZENODO
 
 ## Data :floppy_disk: 
 
-The data are provided in the Raw data folder.
+The data are provided in the Data folder.
 
 - Data for size allometry analysis: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* 
 Specimen codes are the same as the ones listed in table S1, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
@@ -33,7 +33,7 @@ Same as for the tympanic bulla.
 ## Analysis :computer:
 In this repository you will find raw data (.csv and data files) and code for analyses (code supplied as .R files)
 
-📁 Raw data
+📁 Data
 
 As described above
 
@@ -41,7 +41,7 @@ As described above
 
 *ossification_size_allometry_analyses.R, tympanic_bulla_shape_analyses.R, periotic_shape_analyses.R*
 
-Before running analyses, save all the raw data files in a folder called "Data" in the same directory as the R project. This will allow to import the data as detailed in the code provided.
+Before running analyses, save Data folder in the same directory as the R project. This will allow to import the data as detailed in the code provided.
 
 ## License 📃
 This project is licensed under the MIT License - see the LICENSE.md file for details
