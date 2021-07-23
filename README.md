@@ -20,10 +20,10 @@ DOI ZENODO
 The data are provided in the Data folder.
 
 - Data for size allometry analysis: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* 
-Specimen codes are the same as the ones listed in table S1, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
+Specimen codes are the same as the ones listed in table S1 attached to the publication, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
 
 - Data for shape analysis of the tympanic bulla: *_gpsa_homologized_points_bulla_R.dat, _gpsa_ordination_projections_bulla_R.Rdata, _gpsa_ordination_values_bulla_R.RData, bulla_classifiers.csv*
-Homologized points file contains the coordinates for the aligned points as produced by the GPSA. Ordination projections ar ethe PCOORD valeu also as produced by the GPSA. PCOORD oridination values were copied from the GPSA print out during analysis and the file produced was updated to include also the proportaional and cumulative values. Classifier files contains group, taxon, onotgentic category an measuraments of leght for the bulla and periotic for all specimens. For spciemns codes and numbers see the publiciation and table S1.
+Homologized points file contains the coordinates for the aligned points as produced by the GPSA. Ordination projections are the PCOORD scores for each specimen also as produced by the GPSA. PCOORD oridination values were copied from the GPSA print out during analysis and the file produced was updated to include also the proportional and cumulative values. Classifier file contains group, taxon, ontogenetic category and measuraments of lenght for the bulla and periotic for all specimens in the dataset. For speciemens codes and numbers see the publication and table S1.
 
 - Data for shape analysis of the periotic: *_gpsa_homologized_points_periotic_R.dat, _gpsa_ordination_projections_periotic_R.Rdata, _gpsa_ordination_values_periotic_R.RData, periotic_classifiers.csv*
 Same as for the tympanic bulla.
