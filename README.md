@@ -19,13 +19,16 @@ DOI ZENODO
 
 The data are provided in the Data folder.
 
+Homologized points files that contain the coordinates for the aligned points as produced by the GPSA for the bulla and periotic (*_gpsa_homologized_points_bulla_R.dat, _gpsa_homologized_points_periotic_R.dat*) can be found in the the Dryad repository as they exceed the size limit for GitHub.
+Available at: Dryad DOI
+
 - __Data for size allometry analysis__: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* <br />
 Specimen codes are the same as the ones listed in table S1 attached to the publication, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
 
-- __Data for shape analysis of the tympanic bulla__: *_gpsa_homologized_points_bulla_R.dat, _gpsa_ordination_projections_bulla_R.Rdata, _gpsa_ordination_values_bulla_R.RData, bulla_classifiers.csv* <br />
-Homologized points file contains the coordinates for the aligned points as produced by the GPSA. Ordination projections are the PCOORD scores for each specimen also as produced by the GPSA. PCOORD oridination values were copied from the GPSA print out during analysis and the file produced was updated to include also the proportional and cumulative values. Classifier file contains group, taxon, ontogenetic category and measuraments of lenght for the bulla and periotic for all specimens in the dataset. For speciemens codes and numbers see the publication and table S1.
+- __Data for shape analysis of the tympanic bulla__: *_gpsa_ordination_projections_bulla_R.Rdata, _gpsa_ordination_values_bulla_R.RData, bulla_classifiers.csv* <br />
+Ordination projections are the PCOORD scores for each specimen also as produced by the GPSA. PCOORD oridination values were copied from the GPSA print out during analysis and the file produced was updated to include also the proportional and cumulative values. Classifier file contains group, taxon, ontogenetic category and measuraments of lenght for the bulla and periotic for all specimens in the dataset. For speciemens codes and numbers see the publication and table S1.
 
-- __Data for shape analysis of the periotic__: *_gpsa_homologized_points_periotic_R.dat, _gpsa_ordination_projections_periotic_R.Rdata, _gpsa_ordination_values_periotic_R.RData, periotic_classifiers.csv* <br />
+- __Data for shape analysis of the periotic__: *_gpsa_ordination_projections_periotic_R.Rdata, _gpsa_ordination_values_periotic_R.RData, periotic_classifiers.csv* <br />
 Same as for the tympanic bulla.
 
 - __Silhouettes of taxa and groups for plots__: *b.bona.png, b.physalus.png, phocoena.png, stenella.png*
