@@ -19,7 +19,7 @@ DOI ZENODO
 
 The data are provided in the Data folder.
 
-Homologized points files that contain the coordinates for the aligned points as produced by the GPSA for the bulla and periotic (*_gpsa_homologized_points_bulla_R.dat, _gpsa_homologized_points_periotic_R.dat*) can be found in the the Dryad repository as they exceed the size limit for GitHub.
+Homologized points files that contain the coordinates for the aligned points as produced by the GPSA for the bulla and periotic (*_gpsa_homologized_points_bulla_R.dat, _gpsa_homologized_points_periotic_R.dat*) can be found in the the Dryad repository as they exceed the size limit for GitHub.  <br />
 Available at: Dryad DOI
 
 - __Data for size allometry analysis__: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* <br />
