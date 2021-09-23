@@ -19,7 +19,7 @@ DOI ZENODO
 
 The data are provided in the Data folder.
 
-- Data for size allometry analysis: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv* 
+- Data for size allometry analysis: *earbones_ossification_events.csv, growth_data.csv, measuraments.csv*
 Specimen codes are the same as the ones listed in table S1 attached to the publication, where additonal details on the specimens are provided. For complete references for the growth data see the publication.
 
 - Data for shape analysis of the tympanic bulla: *_gpsa_homologized_points_bulla_R.dat, _gpsa_ordination_projections_bulla_R.Rdata, _gpsa_ordination_values_bulla_R.RData, bulla_classifiers.csv*
