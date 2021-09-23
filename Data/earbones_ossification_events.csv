@@ -1,0 +1,25 @@
+taxon,group,Age_months,TL_mm,event,bone,bone_g,bone_l,state
+B.bonaerensis,Mysticeti,3.54,100,bulla present,bulla-m,bulla-w,bulla,1
+B.bonaerensis,Mysticeti,4.69,400,bulla processes ossified,bulla-m,bulla-w,bulla,2
+B.bonaerensis,Mysticeti,6.72,1250,bulla completely ossified,bulla-m,bulla-w,bulla,3
+B.bonaerensis,Mysticeti,3.98,200,periotic present,periotic-m,periotic-w,periotic,1
+B.bonaerensis,Mysticeti,5.77,800,periotic processes ossified,periotic-m,periotic-w,periotic,2
+B.bonaerensis,Mysticeti,7.6,1820,periotic completely ossified,periotic-m,periotic-w,periotic,3
+B.physalus,Mysticeti,3.54,615,bulla present,bulla-f,bulla-w,bulla,1
+B.physalus,Mysticeti,4.04,791,bulla processes ossified,bulla-f,bulla-w,bulla,2
+B.physalus,Mysticeti,5.74,1550,bulla completely ossified,bulla-f,bulla-w,bulla,3
+B.physalus,Mysticeti,4.20,850,periotic present,periotic-f,periotic-w,periotic,1
+B.physalus,Mysticeti,5.28,1320,periotic processes ossified,periotic-f,periotic-w,periotic,2
+B.physalus,Mysticeti,7.50,2500,periotic completely ossified,periotic-f,periotic-w,periotic,3
+Ph.phocoena,Odontoceti,2.6,191,bulla present,bulla-p,bulla-d,bulla,1
+Ph.phocoena,Odontoceti,3.5,253,bulla processes ossified,bulla-p,bulla-d,bulla,2
+Ph.phocoena,Odontoceti,5.8,439,bulla completely ossified,bulla-p,bulla-d,bulla,3
+Ph.phocoena,Odontoceti,3.0,240,periotic present,periotic-p,periotic-d,periotic,1
+Ph.phocoena,Odontoceti,4.6,338,periotic processes ossified,periotic-p,periotic-d,periotic,2
+Ph.phocoena,Odontoceti,7.3,530,periotic completely ossified,periotic-p,periotic-d,periotic,3
+St.attenuata,Odontoceti,0.45,15,bulla present,bulla-s,bulla-d,bulla,1
+St.attenuata,Odontoceti,2.7,160,bulla processes ossified,bulla-s,bulla-d,bulla,2
+St.attenuata,Odontoceti,6.3,600,bulla completely ossified,bulla-s,bulla-d,bulla,3
+St.attenuata,Odontoceti,2.7,160,periotic present,periotic-s,periotic-d,periotic,1
+St.attenuata,Odontoceti,3.15,220,periotic processes ossified,periotic-s,periotic-d,periotic,2
+St.attenuata,Odontoceti,7.2,700,periotic completely ossified,periotic-s,periotic-d,periotic,3
