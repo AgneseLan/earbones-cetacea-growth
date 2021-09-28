@@ -6,7 +6,7 @@ Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20E
 To cite the paper:
 
 
-Available at: URL repo
+Available at: https://github.com/AgneseLan/earbones-cetacea-growth
 
 If using any of this code or data please cite the paper above and this repo
 
