@@ -12,8 +12,7 @@ If using any of this code or data please cite the paper above and this repo
 
 To cite this repo:
 
-
-DOI ZENODO
+[![DOI](https://zenodo.org/badge/378241901.svg)](https://zenodo.org/badge/latestdoi/378241901)
 
 ## Data :floppy_disk: 
 
