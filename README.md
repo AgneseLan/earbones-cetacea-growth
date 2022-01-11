@@ -1,10 +1,10 @@
 # Developing echolocation: distinctive patterns in the ontogeny of the tympanoperiotic complex in toothed and baleen whales (Cetacea)
 Analyses of growth allometry and shape change during ontogeny of the bulla and periotic of Cetacea  :dolphin: :whale: 👂
 
-Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20Earbones%20Paper%20Code), Natasha Crouch, Roberto Portela Miguez, Vincet Fernandez, Anjali Goswami
+Authors: [Agnese Lanzetti](mailto:agnese.lanzetti@gmail.com?subject=[GitHub]%20Earbones%20Paper%20Code), Natasha Chrouch, Roberto Portela Miguez, Vincet Fernandez, Anjali Goswami
 
-To cite the paper:
-
+To cite the paper: 
+Agnese Lanzetti, Natasha Chrouch, Roberto Portela Miguez, Vincent Fernandez, Anjali Goswami, Developing echolocation: distinctive patterns in the ontogeny of the tympanoperiotic complex in baleen and toothed whales (Cetacea), Biological Journal of the Linnean Society, Volume 135, Issue 2, February 2022, Pages 394–406, https://doi.org/10.1093/biolinnean/blab160
 
 Available at: https://github.com/AgneseLan/earbones-cetacea-growth
 
