@@ -34,7 +34,7 @@ In this repository you will find raw data (.csv and data files) and code for ana
 
 📁 Data
 
-As described above. Raw shape data files and GPSA results available on Dryad (https://doi.org/10.6086/D1R69C).
+As described above. Raw shape data files and GPSA results available on Dryad (https://datadryad.org/stash/share/P6YMy3QspoUdNIIyy5A9DV5ojdryerS1Bb1GlRO4uwE - https://doi.org/10.6086/D1R69C).
 
 📁 Code for analyses
 
